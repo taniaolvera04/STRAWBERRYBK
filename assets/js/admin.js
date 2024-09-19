@@ -99,6 +99,7 @@ const limpiarP=()=>{
     document.querySelector("#precio").value="";
     document.querySelector("#cantidada").value="";
     document.getElementById("album-preview").src="";
+    document.querySelector("#idc").value="";
 }
 
 

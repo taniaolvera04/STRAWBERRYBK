@@ -1,42 +1,94 @@
-var sesion = localStorage.getItem('usuario') || "null";
+var action=document.getElementById("action");
 
-if (sesion === "null") {
-    window.location.href = "index.html";
+var sesion=localStorage.getItem('usuario') || "null";
+
+if(sesion=="null"){
+    window.location.href="index.html"
 }
 
-const cargarNombre = async () => {
+
+const cargarNombre=async()=>{
+
+    datos=new FormData();
+    datos.append("usuario",sesion);
+    datos.append("action","select");
+
+    let respuesta=await fetch("php/loginUsuario.php",{method:'POST',body:datos});
+    let json=await respuesta.json();
+
+    if(json.success==true){
+        document.getElementById("user").innerHTML=json.mensaje;
+        document.getElementById("foto_perfil").src="php/"+json.foto;
+    }else{
+    Swal.fire({title:"ERROR",text:json.mensaje,icon:"error"});
+    }
+}
+
+document.getElementById("salir").onclick=()=>{
+    Swal.fire({
+        title:"¿Está seguro de Cerrar Sesión?",
+        showDenyButton:true,
+        confirmButtonText:"Si",
+        denyButtonText:`No`
+    }).then((result)=>{
+if(result.isConfirmed){
+localStorage.clear();
+window.location.href="index.html"
+}
+});
+}
+
+
+
+const cargarPerfil = async () => {
     const datos = new FormData();
     datos.append("usuario", sesion);
-    datos.append("action", "select");
+    datos.append("action", "perfil");
 
     try {
         const respuesta = await fetch("php/loginUsuario.php", { method: 'POST', body: datos });
         const json = await respuesta.json();
 
         if (json.success) {
-            document.getElementById("user").innerHTML = json.mensaje;
-            document.getElementById("foto_perfil").src = "php/" + json.foto;
+            document.getElementById("email").innerHTML = json.usuario;
+            document.getElementById("nombre").value = json.nombre;
+            document.getElementById("foto-preview").innerHTML = `<img src="php/${json.foto}" class="foto-perfil">`;
+            document.getElementById("foto_perfil").src = `php/${json.foto}`;
         } else {
             Swal.fire({ title: "ERROR", text: json.mensaje, icon: "error" });
         }
     } catch (error) {
-        console.error('Error al cargar nombre:', error);
+        console.error('Error:', error);
+        Swal.fire({ title: "ERROR", text: "Hubo un problema con la conexión", icon: "error" });
     }
-}
+};
 
-document.getElementById("salir").onclick = () => {
-    Swal.fire({
-        title: "¿Está seguro de Cerrar Sesión?",
-        showDenyButton: true,
-        confirmButtonText: "Si",
-        denyButtonText: `No`
-    }).then((result) => {
-        if (result.isConfirmed) {
-            localStorage.clear();
-            window.location.href = "index.html";
+const guardarPerfil = async (event) => {
+    event.preventDefault(); // Prevenir el comportamiento por defecto del formulario
+
+    const formPerfil = document.getElementById("formPerfil");
+    const datos = new FormData(formPerfil);
+    datos.append("usuario", sesion);
+    datos.append("action", "saveperfil");
+
+    try {
+        const respuesta = await fetch("php/loginUsuario.php", { method: 'POST', body: datos });
+        const json = await respuesta.json();
+
+        if (json.success) {
+            Swal.fire({ title: "¡ÉXITO!", text: json.mensaje, icon: "success" });
+            // Actualiza la imagen de perfil en la página sin recargar
+            document.getElementById("foto-preview").innerHTML = `<img src="php/${json.foto}" class="foto-perfil">`;
+            document.getElementById("foto_perfil").src = `php/${json.foto}`;
+        } else {
+            Swal.fire({ title: "ERROR", text: json.mensaje, icon: "error" });
         }
-    });
-}
+    } catch (error) {
+        console.error('Error:', error);
+        Swal.fire({ title: "ERROR", text: "Hubo un problema con la conexión", icon: "error" });
+    }
+};
+
 
 const cargarCatalogo = async () => {
     try {
@@ -52,7 +104,7 @@ const cargarCatalogo = async () => {
                 <h2>${prenda.nombrea}</h2>
                 <p>${prenda.descripcion}</p>
                 <p>Precio: $${prenda.precio}</p>
-                <div class="input-group mb-3">
+                <div class="input-group mb-2">
                     <button class="btn btn-outline-secondary" type="button" onclick="restarCantidad(${prenda.id_a})">-</button>
                     <input type="number" id="cantidad-${prenda.id_a}" class="form-control text-center" value="1" min="1">
                     <button class="btn btn-outline-secondary" type="button" onclick="sumarCantidad(${prenda.id_a})">+</button>
@@ -241,9 +293,4 @@ function limpiarCarrito() {
     carritoDisplay.innerHTML = '';
 }
 
-// Iniciar el proceso al cargar la página
-document.addEventListener('DOMContentLoaded', () => {
-    cargarNombre();
-    cargarCatalogo();
-    obtenerCarrito();
-});
+

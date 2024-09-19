@@ -7,13 +7,12 @@
     <link rel="stylesheet" href="assets/css/bootstrap.min.css">
 
     <style>
-        img {
+         img {
             padding: 10px;
             border-radius: 100px;
         }
         body {
-            background: rgb(1,0,8);
-            background: radial-gradient(circle, rgba(1,0,8,1) 0%, rgba(201,63,77,1) 100%);
+            background:  rgb(252, 208, 226);
         }
         .profile-photo {
             width: 50px;
@@ -26,19 +25,42 @@
         }
         .registro-card {
             background: rgb(65, 63, 64);
-            background: radial-gradient(circle, rgba(75, 23, 43, 0.816) 0%, rgba(217,177,255,0.7791491596638656) 100%);
+            background: radial-gradient(circle, rgba(153, 68, 153, 0.816) 0%, rgba(221, 185, 255, 0.779) 100%);
             color:white;
+            border-radius: 5%;
+            border: 2px solid  rgba(153, 68, 153, 0.816);
         }
+
+        .btn-primary{
+    height: 50px;
+    border: 2px solid #6d2d6d;
+    border-radius: 45px;
+    transition: all 0.3s;
+    cursor: pointer;
+    background:  #6d2d6d;
+    font-size: 1.1em;
+    font-weight: 540;
+    font-family: 'Montserrat', sans-serif;
+        }
+
+        .btn-primary:hover {
+    background:#b93075;
+    color: white;
+    font-size: 1.2em;
+    border: 2px solid  #b93075;
+
+  }
     </style>
 </head>
 
 <body class="text-center" onload="cargarNombre();cargarPerfil()">
-    <nav class="navbar bg-dark border-bottom border-body" data-bs-theme="dark">
+
+    <nav class="navbar" style="background-color: #d79cff;">
         <div class="container-fluid">
-            <a href="cliente.html"><img src="assets/img/logo.png" alt="Logo" width="57" height="73" class="d-inline-block"></a>
-            <span class="navbar-brand h1">PERFIL</span>
+            <a href="admin.html"><img src="assets/img/logo.png" alt="Logo" width="80" height="80" class="d-inline-block"></a>
+            <span class="navbar-brand h1 text-white">PERFIL</span>
             <span class="navbar-text">
-                <a href="perfilC.html" class="text-decoration-none">
+                <a href="perfilA.html" class="text-decoration-none">
                     <img src="assets/img/p.png" id="foto_perfil" class="profile-photo">
                     <span class="text-white mx-3 h5" id="user">HOLA</span>
                 </a>
