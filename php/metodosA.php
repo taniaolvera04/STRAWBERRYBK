@@ -36,7 +36,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (move_uploaded_file($fileTmpName, $filePath)) {
                 // Insertar los datos del álbum en la base de datos
                 $sqlInsertAlbum = "INSERT INTO albumes (nombrea, descripcion, precio, cantidada, fotoa, categoria) 
-                                   VALUES ('$a', '$b', $c, $e, '$filePath', $h)";
+                                   VALUES ('$a', '$b', $c, $e, '$filePath', '$h')";
         
                 if ($cx->query($sqlInsertAlbum)) {
                     $valido['success'] = true;
@@ -189,8 +189,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                         descripcion = '$b',
                                         precio = $c,
                                         cantidada = $e,
-                                        categoria = $h,
-                                        fotoa = '$filePath'
+                                        fotoa = '$filePath',
+                                        categoria = '$h'
                                         WHERE id_a = $ida";
                 
                     if ($cx->query($sqlUpdateAlbum)) {
@@ -262,21 +262,27 @@ break;
 
     case "updateCa":
 
-        $idc=$_POST['idc'];
-        $a=$_POST['nombrec'];
-    
-        $sql="UPDATE categorias SET categoria='$a' WHERE id_c=$idc";
-    
-        if($cx->query($sql)){
-           $valido['success']=true;
-           $valido['mensaje']="SE ACTUALIZÓ CORRECTAMENTE LA CATEGORIA";
-        }else{
-            $valido['success']=false;
-           $valido['mensaje']="ERROR AL ACTUALIZAR EN BD"; 
-        }
-    
-        echo json_encode($valido);
-        break;
+    $idc = $_POST['idc'];
+    $a = $_POST['nombrec'];
+
+    // Actualizar la categoría en ambas tablas
+    $sql_categoria = "UPDATE categorias SET categoria='$a' WHERE id_c=$idc";
+    $sql_albumes = "UPDATE albumes SET categoria='$a' WHERE categoria=(SELECT categoria FROM categorias WHERE id_c=$idc)";
+
+    $resultado_categoria = $cx->query($sql_categoria);
+    $resultado_albumes = $cx->query($sql_albumes);
+
+    if ($resultado_categoria && $resultado_albumes) {
+        $valido['success'] = true;
+        $valido['mensaje'] = "SE ACTUALIZÓ CORRECTAMENTE LA CATEGORIA Y ALBUMES";
+    } else {
+        $valido['success'] = false;
+        $valido['mensaje'] = "ERROR AL ACTUALIZAR EN BD";
+    }
+
+    echo json_encode($valido);
+    break;
+
         
     
         case "deleteCa":

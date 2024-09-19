@@ -601,6 +601,9 @@ const guardarCategoria = async () => {
             });
 
             cargarCategorias();
+            selectCategoria();
+            selectCategoria2();
+            
             bootstrap.Modal.getInstance(document.getElementById("addCa")).hide();
             document.querySelector("#nombrec").value="";
             
@@ -653,6 +656,8 @@ const eliminarC = async (idCategoria) => {
                     });
                 }
                 cargarCategorias();
+                selectCategoria();
+                selectCategoria2();
             } catch (error) {
                 console.error('Error al eliminar categoría:', error);
                 Swal.fire({
@@ -712,6 +717,9 @@ const actualizarCategoria = async () => {
         }
         
         cargarCategorias(); 
+        cargarAlbum();
+        selectCategoria();
+        selectCategoria2();
         bootstrap.Modal.getInstance(document.getElementById("editCa")).hide();
         
     } catch (error) {
