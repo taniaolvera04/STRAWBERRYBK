@@ -14,7 +14,7 @@
         
 </head>
 
-<body class="text-center" onload="cargarNombre()">
+<body class="text-center" onload="cargarNombre();selectCategoria();selectCategoria2()">
    
   <nav class="navbar" style="background-color: #d79cff;">
         <div class="container-fluid">
@@ -122,8 +122,10 @@
                       <img id="album-preview" src="#" style="max-width: 100%; max-height: 140px; display: none; margin: 0 auto;">
                   </div>
                   <div>
-                      <label class="form-label">ID_C</label>
-                      <input type="number" class="form-control text-center" id="idc" min="1">
+                      <label class="form-label">CATEGORIA</label>
+                      <select name="categorias" class="form-control m-75 m-auto text-center" id="categoria">
+                    </select>
+    
                   </div>
               </form>                
           </div>
@@ -179,8 +181,10 @@
                   <img id="ealbum-preview" src="#" style="max-width: 100%; max-height: 140px; margin: 0 auto;">
               </div>
               <div>
-                <label  class="form-label">ID_C</label>
-                <input type="number" class="form-control text-center" id="eidc" min="1">
+                <label class="form-label">CATEGORIA</label>
+                <select name="categorias" class="form-control m-75 m-auto text-center" id="ecategoria">
+              </select>
+
             </div>
           </form>                
       </div>

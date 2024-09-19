@@ -18,7 +18,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $b = $_POST['descripcion'] ?? '';
             $c = $_POST['precio'] ?? 0;
             $e = $_POST['cantidada'] ?? 0;
-            $h = $_POST['idc'] ?? '';
+            $h = $_POST['categoria'] ?? '';
          
             // Manejo de la imagen
             $fileName = $_FILES['fotoa']['name'];
@@ -35,7 +35,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Mover la imagen subida al directorio deseado
             if (move_uploaded_file($fileTmpName, $filePath)) {
                 // Insertar los datos del álbum en la base de datos
-                $sqlInsertAlbum = "INSERT INTO albumes (nombrea, descripcion, precio, cantidada, fotoa, id_c) 
+                $sqlInsertAlbum = "INSERT INTO albumes (nombrea, descripcion, precio, cantidada, fotoa, categoria) 
                                    VALUES ('$a', '$b', $c, $e, '$filePath', $h)";
         
                 if ($cx->query($sqlInsertAlbum)) {
@@ -50,20 +50,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
             echo json_encode($valido);
             break;
-        
 
+
+        
             case "selectAll":
 
-                $sql="SELECT * FROM albumes";
-                $registros=array('data'=>array());
-                $res=$cx->query($sql);
-                if($res->num_rows>0){
-                    while($row=$res->fetch_array()){
-                        $registros['data'][]=array($row[0],$row[1],$row[2],$row[3],$row[4],$row[5],$row[6]);
-                    }
+                $sql = "SELECT albumes.id_a, albumes.nombrea, albumes.descripcion, albumes.precio, albumes.cantidada,
+                albumes.fotoa, categorias.categoria 
+                FROM albumes
+                INNER JOIN categorias ON albumes.categoria = categorias.categoria"; 
+            
+            $registros=array('data'=>array());
+            $res=$cx->query($sql);
+            if($res->num_rows>0){
+                while($row=$res->fetch_array()){
+                    $registros['data'][]=array($row[0],$row[1],$row[2],$row[3],$row[4],$row[5],$row[6]);
                 }
-                
-                echo json_encode($registros);
+            }
+            
+            echo json_encode($registros);
             
             break;
 
@@ -113,7 +118,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     'precio' => "",
                     'cantidada' => "",
                     'fotoa' => "",
-                    'idc' => ""
+                    'categoria' => ""
                 ];
             
                 $ida = $_POST['ida'];
@@ -129,7 +134,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $valido['precio'] = $row['precio'];
                     $valido['cantidada'] = $row['cantidada'];
                     $valido['fotoa'] = $row['fotoa'];
-                    $valido['idc'] = $row['id_c'];
+                    $valido['categoria'] = $row['categoria'];
                 } else {
                     $valido['mensaje'] = "Álbum no encontrado.";
                 }
@@ -146,7 +151,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $b = $_POST['descripcion'] ?? '';
                     $c = $_POST['precio'] ?? 0;
                     $e = $_POST['cantidada'] ?? 0;
-                    $h = $_POST['idc'] ?? '';
+                    $h = $_POST['categoria'] ?? '';
                 
                     // Manejo de la imagen
                     $fileName = $_FILES['fotoa']['name'];
@@ -184,7 +189,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                         descripcion = '$b',
                                         precio = $c,
                                         cantidada = $e,
-                                        id_c = $h,
+                                        categoria = $h,
                                         fotoa = '$filePath'
                                         WHERE id_a = $ida";
                 
@@ -312,8 +317,12 @@ break;
             break;
 
             case "selectAllOr":
-                $sql = "SELECT id_o, id_u, nombrea, cantidad, total, fecha_o FROM orden";
-                $registros = array('data' => array());
+
+                $sql = "SELECT o.id_o, u.nombre, o.nombrea, o.cantidad, o.total, o.fecha_o
+                FROM orden o
+                INNER JOIN usuarios u ON o.id_u = u.id_u"; 
+                
+               $registros = array('data' => array());
     
                 $res = $cx->query($sql);
                 if ($res && $res->num_rows > 0) {
@@ -321,7 +330,7 @@ break;
                         // Ensure to format data as needed
                         $registros['data'][] = array(
                             $row['id_o'],
-                            $row['id_u'],
+                            $row['nombre'],
                             $row['nombrea'],
                             $row['cantidad'],
                             floatval($row['total']),
@@ -333,6 +342,7 @@ break;
                 echo json_encode($registros);
                 break;
     
+                
             
 }
 

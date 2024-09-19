@@ -99,21 +99,51 @@ const limpiarP=()=>{
     document.querySelector("#precio").value="";
     document.querySelector("#cantidada").value="";
     document.getElementById("album-preview").src="";
-    document.querySelector("#idc").value="";
+    document.querySelector("#categoria").value="";
 }
+
+
+const selectCategoria = async () => {
+    let datos = new FormData();
+    datos.append("action", "selectAllCa");
+
+    try {
+        let respuesta = await fetch("php/metodosA.php", { method: 'POST', body: datos });
+        let json = await respuesta.json();
+
+        console.log(json); // Añade esto para verificar la respuesta
+
+        if (json.data) {
+            let selectCategoria = document.getElementById('categoria');
+            selectCategoria.innerHTML = "";
+
+            json.data.forEach(categoria => {
+                let option = document.createElement('option');
+                option.value = categoria[1]; // Asegúrate de que el índice correcto está en uso
+                option.textContent = categoria[1];
+                selectCategoria.appendChild(option);
+            });
+        }
+    } catch (error) {
+        console.error('Error al cargar categorías:', error);
+    }
+};
+
+
 
 
 
 
 const guardarAlbum = async () => {
+
     let nombrea = document.getElementById('nombrea').value;
     let descripcion = document.getElementById('descripcion').value;
     let precio = parseFloat(document.getElementById('precio').value);
     let cantidada = parseInt(document.getElementById('cantidada').value);
     let fotoa = document.getElementById('fotoa').files[0]; 
-    let idc = parseInt(document.getElementById('idc').value);
+    let categoria = document.getElementById('categoria').value;
 
-    if (nombrea.trim() === "" || descripcion.trim() === "" || isNaN(precio) || isNaN(cantidada) || !fotoa || isNaN(idc)) {
+    if (nombrea.trim() === "" || descripcion.trim() === "" || isNaN(precio) || isNaN(cantidada) || !fotoa) {
         Swal.fire({
             title: "ERROR",
             text: "Falta completar campos o seleccionar una imagen",
@@ -128,7 +158,7 @@ const guardarAlbum = async () => {
     datos.append("precio", precio);
     datos.append("cantidada", cantidada);
     datos.append("fotoa", fotoa); 
-    datos.append("idc", idc); 
+    datos.append("categoria", categoria); 
     datos.append('action', 'guardar');
 
     try {
@@ -189,7 +219,7 @@ const cargarAlbum = async () => {
                     <th>PRECIO</th>
                     <th>CANTIDAD</th>
                     <th>IMAGEN</th>
-                    <th>ID_C</th>
+                    <th>CATEGORÍA</th>
                     <th>ACTION</th>
                 </tr>
             </thead>
@@ -313,6 +343,32 @@ const eliminarA = async (ida) => {
 
 
 
+const selectCategoria2 = async () => {
+    let datos = new FormData();
+    datos.append("action", "selectAllCa");
+
+    try {
+        let respuesta = await fetch("php/metodosA.php", { method: 'POST', body: datos });
+        let json = await respuesta.json();
+
+        console.log(json); // Añade esto para verificar la respuesta
+
+        if (json.data) {
+            let selectCategoria = document.getElementById('ecategoria');
+            selectCategoria.innerHTML = "";
+
+            json.data.forEach(categoria => {
+                let option = document.createElement('option');
+                option.value = categoria[1]; // Asegúrate de que el índice correcto está en uso
+                option.textContent = categoria[1];
+                selectCategoria.appendChild(option);
+            });
+        }
+    } catch (error) {
+        console.error('Error al cargar categorías:', error);
+    }
+};
+
 
 // Mostrar información del álbum en el modal
 const mostrarA = async (ida) => {
@@ -330,7 +386,7 @@ const mostrarA = async (ida) => {
         document.querySelector("#eprecio").value = json.precio;
         document.querySelector("#ecantidada").value = json.cantidada;
         document.getElementById("ealbum-preview").src = "img_albumes/" + json.fotoa;
-        document.querySelector("#eidc").value = json.idc;
+        document.querySelector("#ecategoria").value = json.categoria;
     } else {
         Swal.fire({
             title: "ERROR",
@@ -340,6 +396,12 @@ const mostrarA = async (ida) => {
     }
 };
 
+
+
+
+
+
+
 // Actualizar álbum
 const actualizarAlbum = async () => {
     var ida = document.querySelector("#ida").value;
@@ -348,9 +410,9 @@ const actualizarAlbum = async () => {
     var precio = document.querySelector("#eprecio").value;
     var cantidada = document.querySelector("#ecantidada").value;
     var fotoa = document.querySelector("#efotoa").files[0]; 
-    var idc = document.querySelector("#eidc").value;
+    var categoria = document.querySelector("#ecategoria").value;
 
-    if (nombrea.trim() == "" || descripcion.trim() == "" || precio.trim() == "" || cantidada.trim() == "" || idc.trim() == "") {
+    if (nombrea.trim() == "" || descripcion.trim() == "" || precio.trim() == "" || cantidada.trim() == "" ) {
         Swal.fire({
             title: "ERROR",
             text: "Tienes campos vacíos",
@@ -365,7 +427,7 @@ const actualizarAlbum = async () => {
     datos.append("descripcion", descripcion);
     datos.append("precio", precio);
     datos.append("cantidada", cantidada);
-    datos.append("idc", idc);
+    datos.append("categoria", categoria);
     datos.append("fotoa", fotoa); 
     datos.append('action', 'update');
 
@@ -739,8 +801,8 @@ const mostrarOrden = async () => {
                 <thead>
                     <tr>
                         <th>ID ORDEN</th>
-                        <th>ID USUARIO</th>
-                        <th>NOMBRE ALBUM</th>
+                        <th>NOMBRE DE USUARIO</th>
+                        <th>NOMBRE DE ÁLBUM</th>
                         <th>CANTIDAD</th>
                         <th>TOTAL</th>
                         <th>FECHA</th>
