@@ -38,31 +38,31 @@
 
 
     <h2 id="ca">CARRITO</h2>
-    <table class="table table-bordered w-75 m-auto">
-      <thead>
-          <tr>
-              <th>#</th>
-              <th>Foto</th>
-              <th>Nombre</th>
-              <th>Talla</th>
-              <th>Precio</th>
-              <th>Cantidad</th>
-              <th>Acción</th>
-          </tr>
-      </thead>
-      <tbody id="carrito-table-body">
-      </tbody>
-      <tfoot>
-          <tr>
-              <td colspan="4"></td>
-              <td><h3>TOTAL</h3></td>
-              <td colspan="2"><span id="total-carrito-display">$0</span></td>
-          </tr>
-      </tfoot>
-  </table>
-  
+<table class="table table-bordered w-75 m-auto">
+    <thead>
+        <tr>
+            <th>#</th>
+            <th>Foto</th>
+            <th>Nombre</th>
+            <th>Precio</th>
+            <th>Cantidad</th>
+            <th>Acción</th>
+        </tr>
+    </thead>
+    <tbody id="carrito-table-body">
+        <!-- Aquí se agregarán dinámicamente las filas del carrito -->
+    </tbody>
+    <tfoot>
+        <tr>
+            <td colspan="4">Total</td>
+            <td id="total-carrito-display">$0</td>
+        </tr>
+    </tfoot>
+</table>
 
-<button id="confirmarCompra" class="btn btn-primary mt-3" onclick="confirmarCompra()">Confirmar Compra</button>
+  
+  <button id="confirmarCompra" class="btn btn-primary mt-3" onclick="confirmarCompra()">Confirmar Compra</button>
+
 
 
 

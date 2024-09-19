@@ -1,8 +1,8 @@
 <?php
 require_once "config.php";
 header('Content-Type: application/json; charset=utf-8');
-date_default_timezone_set('America/Mexico_City'); // Cambia 'America/Mexico_City' por tu zona horaria local
 
+date_default_timezone_set('America/Mexico_City');
 
 $valido = ['success' => false, 'mensaje' => ''];
 
@@ -10,219 +10,170 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $action = $_POST['action'] ?? '';
 
     switch ($action) {
-
         case "agregarC":
-            $idProducto = $_POST['id_p'] ?? '';
+            $idAlbum = $_POST['id_a'] ?? '';
             $usuario = $_POST['usuario'] ?? '';
-            $cantidad = $_POST['cantidad'] ?? 1;
-
-            // Verificar si el usuario existe
-            $sqlUsuario = "SELECT id_u FROM usuarios WHERE usuario = ?";
-            $stmtUsuario = $cx->prepare($sqlUsuario);
+            $cantidad = (int) ($_POST['cantidad'] ?? 1);
+        
+            // Obtener ID de usuario
+            $stmtUsuario = $cx->prepare("SELECT id_u FROM usuarios WHERE usuario = ?");
             $stmtUsuario->bind_param("s", $usuario);
             $stmtUsuario->execute();
             $resultadoUsuario = $stmtUsuario->get_result();
-
+        
             if ($resultadoUsuario->num_rows > 0) {
-                $row = $resultadoUsuario->fetch_assoc();
-                $idUsuario = $row['id_u'];
-
-                // Verificar si el producto ya está en el carrito
-                $sqlExisteProducto = "SELECT id_carrito, cantidad FROM carrito WHERE id_u = ? AND id_p = ?";
-                $stmtExisteProducto = $cx->prepare($sqlExisteProducto);
-                $stmtExisteProducto->bind_param("ii", $idUsuario, $idProducto);
-                $stmtExisteProducto->execute();
-                $resultadoExisteProducto = $stmtExisteProducto->get_result();
-
-                if ($resultadoExisteProducto->num_rows > 0) {
-                    // Producto ya existe en el carrito, actualizar cantidad
-                    $rowProducto = $resultadoExisteProducto->fetch_assoc();
-                    $idCarrito = $rowProducto['id_carrito'];
-                    $cantidadExistente = $rowProducto['cantidad'];
-
-                    $nuevaCantidad = $cantidadExistente + $cantidad;
-
-                    $sqlUpdate = "UPDATE carrito SET cantidad = ? WHERE id_carrito = ?";
-                    $stmtUpdate = $cx->prepare($sqlUpdate);
-                    $stmtUpdate->bind_param("ii", $nuevaCantidad, $idCarrito);
-
-                    if ($stmtUpdate->execute()) {
-                        $valido['success'] = true;
-                        $valido['mensaje'] = "Cantidad de prenda actualizada en el carrito";
-
-                        // Registrar movimiento de compra en la tabla movimientos
-                        $tipoMovimiento = "venta";
-                        $fechaHora = date("Y-m-d H:i:s");
-                        $sqlMovimiento = "INSERT INTO movimientos (fecha, tipomov, id_p, id_u, cant) VALUES (?, ?, ?, ?, ?)";
-                        $stmtMovimiento = $cx->prepare($sqlMovimiento);
-                        $stmtMovimiento->bind_param("ssiii", $fechaHora, $tipoMovimiento, $idProducto, $idUsuario, $nuevaCantidad);
-
-                        if (!$stmtMovimiento->execute()) {
-                            $valido['mensaje'] .= ". Error al registrar movimiento: " . $stmtMovimiento->error;
-                        }
-                    } else {
-                        $valido['mensaje'] = "Error al actualizar cantidad de la prenda en el carrito: " . $stmtUpdate->error;
-                    }
+                $idUsuario = $resultadoUsuario->fetch_assoc()['id_u'];
+        
+                // Comprobar si el álbum ya está en el carrito
+                $stmtAlbum = $cx->prepare("SELECT id_ca, cantidad FROM carrito WHERE id_u = ? AND id_a = ?");
+                $stmtAlbum->bind_param("ii", $idUsuario, $idAlbum);
+                $stmtAlbum->execute();
+                $resultadoAlbum = $stmtAlbum->get_result();
+        
+                if ($resultadoAlbum->num_rows > 0) {
+                    // Actualizar cantidad
+                    $rowAlbum = $resultadoAlbum->fetch_assoc();
+                    $nuevaCantidad = $rowAlbum['cantidad'] + $cantidad;
+        
+                    $stmtUpdate = $cx->prepare("UPDATE carrito SET cantidad = ? WHERE id_ca = ?");
+                    $stmtUpdate->bind_param("ii", $nuevaCantidad, $rowAlbum['id_ca']);
+                    $valido['success'] = $stmtUpdate->execute();
+                    $valido['mensaje'] = $valido['success'] ? "Cantidad actualizada" : "Error al actualizar cantidad";
                 } else {
-                    // Producto no existe en el carrito, insertar nuevo producto
-                    $sqlProducto = "SELECT nombrep, precio, talla, fotop FROM prendas WHERE id_p = ?";
-                    $stmtProducto = $cx->prepare($sqlProducto);
-                    $stmtProducto->bind_param("i", $idProducto);
-                    $stmtProducto->execute();
-                    $resultadoProducto = $stmtProducto->get_result();
-
-                    if ($resultadoProducto->num_rows > 0) {
-                        $rowProducto = $resultadoProducto->fetch_assoc();
-                        $nombreProducto = $rowProducto['nombrep'];
-                        $precioProducto = $rowProducto['precio'];
-                        $fotoProducto = $rowProducto['fotop'];
-                        $tallaProducto = $rowProducto['talla'];
-
-                        $sqlInsert = "INSERT INTO carrito (id_p, fotop, nombrep, talla, precio, cantidad, id_u) 
-                                      VALUES (?, ?, ?, ?, ?, ?, ?)";
-                        $stmtInsert = $cx->prepare($sqlInsert);
-                        $stmtInsert->bind_param("isssdii", $idProducto, $fotoProducto, $nombreProducto, $tallaProducto, $precioProducto, $cantidad, $idUsuario);
-
-                        if ($stmtInsert->execute()) {
-                            $valido['success'] = true;
-                            $valido['mensaje'] = "Prenda agregada a carrito";
-
-                            // Registrar movimiento de compra en la tabla movimientos
-                            $tipoMovimiento = "venta";
+                    // Agregar nuevo álbum al carrito
+                    $stmtNuevoAlbum = $cx->prepare("SELECT nombrea, precio FROM albumes WHERE id_a = ?");
+                    $stmtNuevoAlbum->bind_param("i", $idAlbum);
+                    $stmtNuevoAlbum->execute();
+                    $rowAlbum = $stmtNuevoAlbum->get_result()->fetch_assoc();
+        
+                    if ($rowAlbum) {
+                        $stmtInsert = $cx->prepare("INSERT INTO carrito (id_a, nombrea, precio, cantidad, id_u) VALUES (?, ?, ?, ?, ?)");
+                        $stmtInsert->bind_param("issdi", $idAlbum, $rowAlbum['nombrea'], $rowAlbum['precio'], $cantidad, $idUsuario);
+                        $valido['success'] = $stmtInsert->execute();
+                        $valido['mensaje'] = $valido['success'] ? "Álbum agregado al carrito" : "Error al agregar al carrito";
+        
+                        // Guardar en orden y detalle_o al agregar al carrito
+                        if ($valido['success']) {
+                            $totalCompra = $rowAlbum['precio'] * $cantidad;
                             $fechaHora = date("Y-m-d H:i:s");
-                            $sqlMovimiento = "INSERT INTO movimientos (fecha, tipomov, id_p, id_u, cant) VALUES (?, ?, ?, ?, ?)";
-                            $stmtMovimiento = $cx->prepare($sqlMovimiento);
-                            $stmtMovimiento->bind_param("ssiii", $fechaHora, $tipoMovimiento, $idProducto, $idUsuario, $cantidad);
+        
+                            // Insertar en la tabla orden
+                            $stmtOrden = $cx->prepare("INSERT INTO orden (id_u, total, fecha_o) VALUES (?, ?, ?)");
+                            $stmtOrden->bind_param("ids", $idUsuario, $totalCompra, $fechaHora);
+                            $stmtOrden->execute();
+                            $idOrden = $cx->insert_id; // Obtener el ID de la nueva orden
+        
+                            // Insertar en detalle_o
+                            $stmtDetalleO = $cx->prepare("INSERT INTO detalle_o (id_o, id_a, cantidad, fechahr) VALUES (?, ?, ?, ?)");
+                            $stmtDetalleO->bind_param("iiis", $idOrden, $idAlbum, $cantidad, $fechaHora);
+                            $stmtDetalleO->execute();
 
-                            if (!$stmtMovimiento->execute()) {
-                                $valido['mensaje'] .= ". Error al registrar movimiento: " . $stmtMovimiento->error;
-                            }
-                        } else {
-                            $valido['mensaje'] = "Error al agregar prenda al carrito: " . $stmtInsert->error;
+                            $stmtDetalleO = $cx->prepare("INSERT INTO detalle_ca (id_ca id_a, cantidad, fechahr) VALUES (?, ?, ?,?)");
+                            $stmtDetalleO->bind_param("iiis", $idOrden, $idAlbum, $cantidad, $fechaHora);
+                            $stmtDetalleO->execute();
                         }
                     } else {
-                        $valido['mensaje'] = "No se encontró el producto con ID $idProducto";
+                        $valido['mensaje'] = "Álbum no encontrado";
                     }
                 }
             } else {
-                $valido['mensaje'] = "No se encontró el usuario '$usuario'";
+                $valido['mensaje'] = "Usuario no encontrado";
             }
-            echo json_encode($valido);
             break;
-
-            
+        
 
         case "eliminarC":
-            $idCarrito = $_POST['id_carrito'] ?? '';
+            $idCarrito = $_POST['id_ca'] ?? '';
+            $stmtSelect = $cx->prepare("SELECT id_a FROM carrito WHERE id_ca = ?");
+            $stmtSelect->bind_param("i", $idCarrito);
+            $stmtSelect->execute();
+            $resultadoSelect = $stmtSelect->get_result();
 
-            if (!empty($idCarrito)) {
-                $sqlDelete = "DELETE FROM carrito WHERE id_carrito = ?";
-                $stmtDelete = $cx->prepare($sqlDelete);
+            if ($resultadoSelect->num_rows > 0) {
+                $row = $resultadoSelect->fetch_assoc();
+                $idAlbum = $row['id_a'];
+
+                $stmtDelete = $cx->prepare("DELETE FROM carrito WHERE id_ca = ?");
                 $stmtDelete->bind_param("i", $idCarrito);
-
-                if ($stmtDelete->execute()) {
-                    $valido['success'] = true;
-                    $valido['mensaje'] = "Producto eliminado del carrito correctamente";
-                } else {
-                    $valido['mensaje'] = "Error al eliminar producto del carrito: " . $stmtDelete->error;
-                }
+                $valido['success'] = $stmtDelete->execute();
+                $valido['mensaje'] = $valido['success'] ? "Álbum eliminado" : "Error al eliminar álbum";
             } else {
-                $valido['mensaje'] = "ID de carrito no proporcionado";
+                $valido['mensaje'] = "Álbum no encontrado en el carrito";
             }
-            echo json_encode($valido);
             break;
 
         case "listarC":
             $usuario = $_POST['usuario'] ?? '';
-
-            $sqlUsuario = "SELECT id_u FROM usuarios WHERE usuario = ?";
-            $stmtUsuario = $cx->prepare($sqlUsuario);
+            $stmtUsuario = $cx->prepare("SELECT id_u FROM usuarios WHERE usuario = ?");
             $stmtUsuario->bind_param("s", $usuario);
             $stmtUsuario->execute();
             $resultadoUsuario = $stmtUsuario->get_result();
-
+        
             if ($resultadoUsuario->num_rows > 0) {
-                $row = $resultadoUsuario->fetch_assoc();
-                $idUsuario = $row['id_u'];
-
-                $sqlCarrito = "SELECT id_carrito, id_p,  fotop, nombrep, talla, precio, cantidad FROM carrito WHERE id_u = ?";
-                $stmtCarrito = $cx->prepare($sqlCarrito);
+                $idUsuario = $resultadoUsuario->fetch_assoc()['id_u'];
+                $stmtCarrito = $cx->prepare("SELECT id_ca, id_a, fotoa, nombrea, precio, cantidad FROM carrito WHERE id_u = ?");
                 $stmtCarrito->bind_param("i", $idUsuario);
                 $stmtCarrito->execute();
                 $resultadoCarrito = $stmtCarrito->get_result();
+        
                 $carrito = [];
-
-                if ($resultadoCarrito->num_rows > 0) {
-                    while ($rowCarrito = $resultadoCarrito->fetch_assoc()) {
-                        // Construir la URL completa de la imagen
-                        $fotoURL = 'img_prendas/' . $rowCarrito['fotop'];
-                    
-                        $carrito[] = [
-                            'id_carrito' => $rowCarrito['id_carrito'],
-                            'id_p' => $rowCarrito['id_p'],
-                            'fotop' => $fotoURL, // Aquí asignamos la URL completa de la imagen
-                            'nombrep' => $rowCarrito['nombrep'],
-                            'talla' => $rowCarrito['talla'],
-                            'precio' => $rowCarrito['precio'],
-                            'cantidad' => $rowCarrito['cantidad']
-                        ];
-                    }
-                    
-
-                    $totalCarrito = 0;
-                    foreach ($carrito as $producto) {
-                        $totalCarrito += $producto['precio'] * $producto['cantidad'];
-                    }
-
-                    echo json_encode(['success' => true, 'carrito' => $carrito, 'total' => $totalCarrito]);
-                    
-                } else {
-                    echo json_encode(['success' => true, 'carrito' => [], 'total' => 0]); // No hay productos en el carrito
+                while ($rowCarrito = $resultadoCarrito->fetch_assoc()) {
+                    $carrito[] = $rowCarrito;
                 }
+        
+                $totalCarrito = array_reduce($carrito, fn($carry, $item) => $carry + ($item['precio'] * $item['cantidad']), 0);
+                echo json_encode(['success' => true, 'carrito' => $carrito, 'total' => $totalCarrito]);
             } else {
-                echo json_encode(['success' => false, 'mensaje' => "No se encontró el usuario '$usuario'"]);
+                echo json_encode(['success' => false, 'mensaje' => "Usuario no encontrado"]);
             }
             break;
 
-
-              case "confirmarCompra":
-            $usuario = $_POST['usuario'] ?? '';
-
-            $sqlUsuario = "SELECT id_u FROM usuarios WHERE usuario = ?";
-            $stmtUsuario = $cx->prepare($sqlUsuario);
-            $stmtUsuario->bind_param("s", $usuario);
-            $stmtUsuario->execute();
-            $resultadoUsuario = $stmtUsuario->get_result();
-
-            if ($resultadoUsuario->num_rows > 0) {
-                $row = $resultadoUsuario->fetch_assoc();
-                $idUsuario = $row['id_u'];
-
-                // Eliminar todos los productos del carrito para este usuario
-                $sqlDelete = "DELETE FROM carrito WHERE id_u = ?";
-                $stmtDelete = $cx->prepare($sqlDelete);
-                $stmtDelete->bind_param("i", $idUsuario);
-
-                if ($stmtDelete->execute()) {
-                    $valido['success'] = true;
-                    $valido['mensaje'] = "Compra confirmada y productos eliminados del carrito";
-                } else {
-                    $valido['mensaje'] = "Error al eliminar productos del carrito: " . $stmtDelete->error;
-                }
-            } else {
-                $valido['mensaje'] = "No se encontró el usuario '$usuario'";
-            }
-
-            echo json_encode($valido);
-            break;
+            case "confirmarCompra":
+                $usuario = $_POST['usuario'] ?? '';
+                $stmtUsuario = $cx->prepare("SELECT id_u FROM usuarios WHERE usuario = ?");
+                $stmtUsuario->bind_param("s", $usuario);
+                $stmtUsuario->execute();
+                $resultadoUsuario = $stmtUsuario->get_result();
             
-
-
-        default:
-            echo json_encode(['success' => false, 'mensaje' => "Acción no válida"]);
-            break;
+                if ($resultadoUsuario->num_rows > 0) {
+                    $idUsuario = $resultadoUsuario->fetch_assoc()['id_u'];
+            
+                    // Obtener todos los álbumes en el carrito
+                    $stmtCarrito = $cx->prepare("SELECT id_ca, id_a FROM carrito WHERE id_u = ?");
+                    $stmtCarrito->bind_param("i", $idUsuario);
+                    $stmtCarrito->execute();
+                    $resultadoCarrito = $stmtCarrito->get_result();
+            
+                    if ($resultadoCarrito->num_rows > 0) {
+                        // Eliminar del carrito
+                        $stmtDeleteCarrito = $cx->prepare("DELETE FROM carrito WHERE id_u = ?");
+                        $stmtDeleteCarrito->bind_param("i", $idUsuario);
+                        $stmtDeleteCarrito->execute();
+            
+                        // Eliminar detalles de cada álbum en detalle_ca
+                        while ($rowCarrito = $resultadoCarrito->fetch_assoc()) {
+                            $idCarrito = $rowCarrito['id_ca']; // Obtener id_ca
+                            $stmtDeleteDetalle = $cx->prepare("DELETE FROM detalle_ca WHERE id_ca = ?");
+                            $stmtDeleteDetalle->bind_param("i", $idCarrito);
+                            $stmtDeleteDetalle->execute();
+                        }
+            
+                        $valido['success'] = true;
+                        $valido['mensaje'] = "Compra confirmada. Se eliminaron los productos del carrito y sus detalles.";
+                    } else {
+                        $valido['mensaje'] = "El carrito está vacío.";
+                    }
+                } else {
+                    $valido['mensaje'] = "Usuario no encontrado.";
+                }
+                break;
+            
     }
 } else {
-    echo json_encode(['success' => false, 'mensaje' => "Método no permitido"]);
+    $valido['mensaje'] = "Método no permitido";
 }
+
+// Al final del archivo PHP
+echo json_encode($valido);
+exit; // Termina la ejecución
 ?>

@@ -19,6 +19,10 @@ if ($resultado && $resultado->num_rows > 0) {
             'fotoa' => $fotoURL 
         );
     }
+} else {
+    // Mensaje de depuración si no se obtienen resultados
+    echo json_encode(['error' => 'No se encontraron álbumes']);
+    exit();
 }
 
 echo json_encode($albumes);
