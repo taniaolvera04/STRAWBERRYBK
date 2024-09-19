@@ -1,0 +1,156 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: "Arial", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  background: rgb(238,232,214);
+background: radial-gradient(circle, rgba(238,232,214,1) 0%, rgba(68,63,201,1) 100%);
+}
+
+ul {
+  list-style: none;
+}
+
+
+h1,
+h3,
+h2,
+h4 {
+  color: #5d0b63;
+  text-align: center;
+  font-weight: 540;
+}
+
+a {
+  color: #d43597;
+  text-decoration: none;
+  font-weight: bold;
+  font-size: 19px;
+}
+
+a:hover {
+  transform: scale(1.2);
+  transition: 2s ease all;
+}
+
+p {
+  font-weight: bold;
+  margin: 0.5rem 0;
+  font-size: 18px;
+  color: rgb(47, 111, 163);
+}
+
+
+.showcase-top{
+  margin: auto;
+}
+
+img{
+  margin-top: -40px;
+  height: 100px;
+  border-radius: 50%;
+}
+
+.showcase {
+  width: 100%;
+  height: 100vh;
+  position: relative;
+  background: rgb(221, 220, 228);
+  background: radial-gradient(circle,rgb(255, 161, 205) 0%, rgb(155, 46, 155) 100%)
+    no-repeat center center/cover;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+
+.showcase-content {
+  position: relative;
+  z-index: 2;
+  width: 470px;
+  height: 500px;
+  background: rgba(232, 255, 254, 0.7);
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  text-align: left;
+  padding: 60px 60px;
+  border-radius: 16px;
+}
+
+.formm h1 {
+  margin-bottom: 20px;
+}
+
+.formm {
+  width: 100%;
+  margin-bottom: 40px;
+}
+
+.formm .info {
+  padding: 5px 0;
+  margin-bottom: 20px;
+}
+
+.formm .info .in {
+  margin-bottom: 30px;
+  width: 100%;
+  height: 50px;
+  border-radius: 5px;
+  border: none;
+  padding: 20px;
+  font-size: inherit;
+}
+
+.formm .btn {
+  margin-bottom: 10px;
+  width: 100%;
+}
+
+.btn-primary {
+  width: 100%;
+  height: 50px;
+  border-radius: 10px;
+  background: rgb(140, 69, 173);
+  color: #ffffff;
+  font-size: 18px;
+  font-weight: bold;
+  box-shadow: 0 1px 0 rgba(255, 114, 236, 0.45);
+  margin-top: -60px;
+}
+
+
+
+#email{
+  background: #ffffff;
+  color: rgb(19, 18, 18);
+}
+
+input[type="password"] {
+  background: #ffffff;
+  color: rgb(15, 15, 15); 
+}
+
+/*  input end */
+
+.signup {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.signup p {
+  margin-right: 15px;
+}
+
+.more {
+  font-size: 0.8em;
+  line-height: 1.1em;
+}

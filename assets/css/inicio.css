@@ -1,0 +1,33 @@
+img{
+    padding: 10px;
+    border-radius: 100px;
+}
+.profile-photo{
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+}
+body{
+  background: rgb(255, 199, 234);
+}
+
+.btn-primary {
+    width: 230px;
+    height: 80px;
+    border: 2px solid #cf61cf;
+    border-radius: 45px;
+    transition: all 0.3s;
+    cursor: pointer;
+    background:  #cf61cf;
+    font-size: 1.1em;
+    font-weight: 550;
+    font-family: 'Montserrat', sans-serif;
+  }
+  
+  .btn-primary:hover {
+    background:#75acd1;
+    color: white;
+    font-size: 1.2em;
+    border: 2px solid  #75acd1;
+
+  }

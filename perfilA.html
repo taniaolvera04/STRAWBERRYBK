@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>INICIO</title>
+    <link rel="stylesheet" href="assets/css/bootstrap.min.css">
+
+    <style>
+
+        img {
+            padding: 10px;
+            border-radius: 100px;
+        }
+        body {
+            background:  rgb(252, 208, 226);
+        }
+        .profile-photo {
+            width: 50px;
+            height: 50px;
+            border-radius: 100%;
+        }
+        .foto-perfil {
+            height: 100px;
+            border: 1px solid white;
+        }
+        .registro-card {
+            background: rgb(65, 63, 64);
+            background: radial-gradient(circle, rgba(153, 68, 153, 0.816) 0%, rgba(221, 185, 255, 0.779) 100%);
+            color:white;
+            border-radius: 5%;
+            border: 2px solid  rgba(153, 68, 153, 0.816);
+        }
+
+        .btn-primary{
+    height: 50px;
+    border: 2px solid #6d2d6d;
+    border-radius: 45px;
+    transition: all 0.3s;
+    cursor: pointer;
+    background:  #6d2d6d;
+    font-size: 1.1em;
+    font-weight: 540;
+    font-family: 'Montserrat', sans-serif;
+        }
+
+        .btn-primary:hover {
+    background:#b93075;
+    color: white;
+    font-size: 1.2em;
+    border: 2px solid  #b93075;
+
+  }
+
+    </style>
+</head>
+
+<body class="text-center" onload="cargarNombre();cargarPerfil()">
+    <nav class="navbar" style="background-color: #d79cff;">
+        <div class="container-fluid">
+            <a href="admin.html"><img src="assets/img/logo.png" alt="Logo" width="80" height="80" class="d-inline-block"></a>
+            <span class="navbar-brand h1 text-white">PERFIL</span>
+            <span class="navbar-text">
+                <a href="perfilA.html" class="text-decoration-none">
+                    <img src="assets/img/p.png" id="foto_perfil" class="profile-photo">
+                    <span class="text-white mx-3 h5" id="user">HOLA</span>
+                </a>
+                <button class="btn btn-danger" id="salir"> 
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-door-open-fill" viewBox="0 0 16 16">
+                        <path d="M1.5 15a.5.5 0 0 0 0 1h13a.5.5 0 0 0 0-1H13V2.5A1.5 1.5 0 0 0 11.5 1H11V.5a.5.5 0 0 0-.57-.495l-7 1A.5.5 0 0 0 3 1.5V15zM11 2h.5a.5.5 0 0 1 .5.5V15h-1zm-2.5 8c-.276 0-.5-.448-.5-1s.224-1 .5-1 .5.448.5 1-.224 1-.5 1"/>
+                    </svg>
+                </button>
+            </span>
+        </div>
+    </nav>
+
+    <div class="container d-flex justify-content-center align-items-center min-vh-100">
+        <div class="card p-4 registro-card" style="width: 100%; max-width: 580px;">
+            <form action="" class="w-75 m-auto" enctype="multipart/form-data" id="formPerfil" onsubmit="guardarPerfil(event)">
+                <h2 class="text-center mb-4">EDITAR PERFIL</h2>
+                <div id="foto-preview">
+                    <img src="assets/img/p.png" class="foto-perfil">
+                </div><br>
+                <label for="username">Nombre de Usuario</label>
+                <h5 id="email"></h5>
+                <label for="nombre">Nombre</label>
+                <input type="text" name="nombre" class="form-control" id="nombre" placeholder="Ingrese su nombre">
+                <label for="foto">Foto</label>
+                <input type="file" name="foto" class="form-control" id="foto"><br>
+                <button class="btn btn-primary mt-4 m-auto w-100">Guardar</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="assets/js/bootstrap.bundle.js"></script>
+    <script src="assets/js/sweetalert2.all.min.js"></script>
+    <script src="assets/js/admin.js"></script>
+</body>
+</html>

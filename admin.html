@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>INICIO</title>
+    <link rel="stylesheet" href="assets/css/bootstrap.min.css">
+    <link rel="stylesheet" href="assets/css/inicio.css">
+
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.12.1/css/dataTables.bootstrap5.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css"
+        integrity="sha512-xh6O/CkQoPOWDdYTDqeRdPCVd1SpvCA9XXcUnZS2FmJNp1coAFzvtCN9BmamE+4aHK8yyUHUSCcJHgXloTyT2A=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+        
+</head>
+
+<body class="text-center" onload="cargarNombre()">
+   
+  <nav class="navbar" style="background-color: #d79cff;">
+        <div class="container-fluid">
+          <img src="assets/img/logo.png" alt="Logo" width="90" height="90"  class="d-inline-block">
+          <span class="navbar-brand h1 text-white" id="h">STRAWBERRY BEAT KINGDOM — ADMIN</span>
+          
+            <span class="navbar-text">
+
+              <a href="perfilA.html" class="text-decoration-none">
+              <img src="assets/img/p.png" id="foto_perfil" class="profile-photo">
+              
+              <span class="text-white mx-3 h5" id="user">HOLA</span>
+            </a>
+            
+              <button class="btn btn-danger" id="salir"> <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-door-open-fill" viewBox="0 0 16 16">
+                  <path d="M1.5 15a.5.5 0 0 0 0 1h13a.5.5 0 0 0 0-1H13V2.5A1.5 1.5 0 0 0 11.5 1H11V.5a.5.5 0 0 0-.57-.495l-7 1A.5.5 0 0 0 3 1.5V15zM11 2h.5a.5.5 0 0 1 .5.5V15h-1zm-2.5 8c-.276 0-.5-.448-.5-1s.224-1 .5-1 .5.448.5 1-.224 1-.5 1"/>
+                </svg> </button>
+            </span>
+        </div>
+      </nav><br>
+
+
+      <button class="btn btn-primary btn-block mx-2" onclick="cargarAlbum()"> ÁLBUMES
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-vinyl" viewBox="0 0 16 16">
+          <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
+          <path d="M8 6a2 2 0 1 0 0 4 2 2 0 0 0 0-4M4 8a4 4 0 1 1 8 0 4 4 0 0 1-8 0"/>
+          <path d="M9 8a1 1 0 1 1-2 0 1 1 0 0 1 2 0"/>
+        </svg>
+    </button>
+
+    <button class="btn btn-primary btn-block mx-2" onclick="mostrarUsu()"> USUARIOS 
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-person-fill" viewBox="0 0 16 16">
+        <path d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6"/>
+      </svg>
+    </button>
+
+
+      <button class="btn btn-primary btn-block mx-2" onclick="cargarCategorias()"> CATEGORÍAS 
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-list-check" viewBox="0 0 16 16">
+          <path fill-rule="evenodd" d="M5 11.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5M3.854 2.146a.5.5 0 0 1 0 .708l-1.5 1.5a.5.5 0 0 1-.708 0l-.5-.5a.5.5 0 1 1 .708-.708L2 3.293l1.146-1.147a.5.5 0 0 1 .708 0m0 4a.5.5 0 0 1 0 .708l-1.5 1.5a.5.5 0 0 1-.708 0l-.5-.5a.5.5 0 1 1 .708-.708L2 7.293l1.146-1.147a.5.5 0 0 1 .708 0m0 4a.5.5 0 0 1 0 .708l-1.5 1.5a.5.5 0 0 1-.708 0l-.5-.5a.5.5 0 0 1 .708-.708l.146.147 1.146-1.147a.5.5 0 0 1 .708 0"/>
+        </svg> 
+    </button>
+
+    
+
+      <button class="btn btn-primary btn-block mx-2" onclick="cargarOrden()"> ORDENES 
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-basket3-fill" viewBox="0 0 16 16">
+          <path d="M5.757 1.071a.5.5 0 0 1 .172.686L3.383 6h9.234L10.07 1.757a.5.5 0 1 1 .858-.514L13.783 6H15.5a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5H.5a.5.5 0 0 1-.5-.5v-1A.5.5 0 0 1 .5 6h1.717L5.07 1.243a.5.5 0 0 1 .686-.172zM2.468 15.426.943 9h14.114l-1.525 6.426a.75.75 0 0 1-.729.574H3.197a.75.75 0 0 1-.73-.574z"/>
+        </svg>
+      </button>
+
+
+
+      <div class="container-fluid w-75 m-auto">
+        <div class="card text-center mt-4">
+          <div class="card-header">
+              <img src="assets/img/logo.png" height="60px">
+           
+          </div>
+  
+          <div class="card-body">
+              <div id="action">            
+                <img src="assets/img/logo.png"  id="eslogan" style="max-width: 100%; width:200px ; height:200px">
+              </div>
+          </div>
+  
+          <div class="card-footer text-body-secondary">
+            TIENDA DE ÁLBUMES DE BTS
+          </div>
+      </div>
+  </div>
+
+
+<!--MODAL PARA AGREGAR UN ÁLBUM-->
+  
+
+<div class="modal fade" id="addA" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-ls">
+      <div class="modal-content">
+          <div class="modal-header">
+              <h1 class="modal-title fs-5 w-100 m-auto" id="exampleModalLabel">AGREGAR ÁLBUMES</h1>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+              <form enctype="multipart/form-data">
+                  <div class="mb-2">
+                      <label class="form-label">NOMBRE DE ÁLBUM</label>
+                      <input type="text" class="form-control text-center" id="nombrea">
+                  </div>
+                  <div class="mb-2">
+                      <label class="form-label">DESCRIPCIÓN</label>
+                      <textarea cols="3" rows="3" class="form-control" id="descripcion"></textarea>
+                  </div>
+                  <div class="mb-2">
+                      <label class="form-label">PRECIO</label>
+                      <input type="number" class="form-control text-center" id="precio">
+                  </div>
+                  <div class="mb-2">
+                      <label class="form-label">CANTIDAD</label>
+                      <input type="number" class="form-control text-center" id="cantidada" min="1">
+                  </div>
+                  <div class="mb-2">
+                      <label class="form-label">FOTO</label>
+                      <input type="file" class="form-control" id="fotoa" onchange="previewImage()">
+                      <img id="album-preview" src="#" style="max-width: 100%; max-height: 140px; display: none; margin: 0 auto;">
+                  </div>
+                  <div>
+                      <label class="form-label">ID_C</label>
+                      <input type="number" class="form-control text-center" id="idc" min="1">
+                  </div>
+              </form>                
+          </div>
+          <div class="modal-footer">
+              <button type="button" class="btn btn-success" onclick="guardarAlbum()">GUARDAR
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-floppy-fill" viewBox="0 0 16 16">
+                      <path d="M0 1.5A1.5 1.5 0 0 1 1.5 0H3v5.5A1.5 1.5 0 0 0 4.5 7h7A1.5 1.5 0 0 0 13 5.5V0h.086a1.5 1.5 0 0 1 1.06.44l1.415 1.414A1.5 1.5 0 0 1 16 2.914V14.5a1.5 1.5 0 0 1-1.5 1.5H14v-5.5A1.5 1.5 0 0 0 12.5 9h-9A1.5 1.5 0 0 0 2 10.5V16h-.5A1.5 1.5 0 0 1 0 14.5z"/>
+                      <path d="M3 16h10v-5.5a.5.5 0 0 0-.5-.5h-9a.5.5 0 0 0-.5.5zm9-16H4v5.5a.5.5 0 0 0 .5.5h7a.5.5 0 0 0 .5-.5zM9 1h2v4H9z"/>
+                  </svg>
+              </button>
+              <button type="button" class="btn btn-danger" data-bs-dismiss="modal">CANCELAR
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-circle-fill" viewBox="0 0 16 16">
+                      <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0M5.354 4.646a.5.5 0 1 0-.708.708L7.293 8l-2.647 2.646a.5.5 0 0 0 .708.708L8 8.707l2.646 2.647a.5.5 0 0 0 .708-.708L8.707 8l2.647-2.646a.5.5 0 0 0-.708-.708L8 7.293z"/>
+                  </svg>
+              </button>              
+          </div>
+      </div>
+  </div>
+</div>
+
+
+<!--MODAL PARA EDITAR UNA PRENDA-->
+  
+<div class="modal fade" id="editA" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-ls">
+      <div class="modal-content">
+      <div class="modal-header">
+          <h1 class="modal-title fs-5 w-100 m-auto" id="exampleModalLabel">ACTUALIZAR ÁLBUMES</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+          <form>
+              <div class="mb-2">
+                  <label  class="form-label">NOMBRE DE ÁLBUM</label>
+                  <input type="text" class="form-control text-center" id="enombrea">
+              </div>
+              <div class="mb-2">
+                  <label  class="form-label">DESCRIPCIÓN</label>
+                 <textarea cols="4" rows="4" class="form-control" id="edescripcion" ></textarea>
+              </div>
+              <div class="mb-2">
+                <label  class="form-label">PRECIO</label>
+                <input type="number" class="form-control text-center" id="eprecio">
+            </div>
+
+              <div class="mb-2">
+                <label  class="form-label">CANTIDAD</label>
+                <input type="number" class="form-control text-center" id="ecantidada">
+            </div>
+              <div>
+                  <label  class="form-label">FOTO</label>
+                  <input type="file" name="efotoa" class="form-control" id="efotoa"  onchange="epreviewImage()">
+                  <img id="ealbum-preview" src="#" style="max-width: 100%; max-height: 140px; margin: 0 auto;">
+              </div>
+              <div>
+                <label  class="form-label">ID_C</label>
+                <input type="number" class="form-control text-center" id="eidc" min="1">
+            </div>
+          </form>                
+      </div>
+      <div class="modal-footer">
+
+        <input type="hidden" id="ida">
+
+          <button type="button" class="btn btn-success" onclick="actualizarAlbum()">  ACTUALIZAR  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-floppy-fill" viewBox="0 0 16 16">
+            <path d="M0 1.5A1.5 1.5 0 0 1 1.5 0H3v5.5A1.5 1.5 0 0 0 4.5 7h7A1.5 1.5 0 0 0 13 5.5V0h.086a1.5 1.5 0 0 1 1.06.44l1.415 1.414A1.5 1.5 0 0 1 16 2.914V14.5a1.5 1.5 0 0 1-1.5 1.5H14v-5.5A1.5 1.5 0 0 0 12.5 9h-9A1.5 1.5 0 0 0 2 10.5V16h-.5A1.5 1.5 0 0 1 0 14.5z"/>
+            <path d="M3 16h10v-5.5a.5.5 0 0 0-.5-.5h-9a.5.5 0 0 0-.5.5zm9-16H4v5.5a.5.5 0 0 0 .5.5h7a.5.5 0 0 0 .5-.5zM9 1h2v4H9z"/>
+          </svg></button>
+          <button type="button" class="btn btn-danger" data-bs-dismiss="modal">   CANCELAR  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-circle-fill" viewBox="0 0 16 16">
+            <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0M5.354 4.646a.5.5 0 1 0-.708.708L7.293 8l-2.647 2.646a.5.5 0 0 0 .708.708L8 8.707l2.646 2.647a.5.5 0 0 0 .708-.708L8.707 8l2.647-2.646a.5.5 0 0 0-.708-.708L8 7.293z"/>
+          </svg> </button>              
+      </div>
+      </div>
+  </div>
+</div> 
+
+
+<!--MODAL PARA AGREGAR UNA CATEGORIA-->
+  
+<div class="modal fade" id="addCa" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+      <div class="modal-header">
+          <h1 class="modal-title fs-5 w-100 m-auto" id="exampleModalLabel">AGREGAR CATEGORÍA</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+          <form>
+              <div class="mb-2">
+                  <label  class="form-label">NOMBRE DE CATEGORÍA</label>
+                  <input type="text" class="form-control text-center" id="nombrec">
+              </div>
+          </form>                
+      </div>
+      <div class="modal-footer">
+
+          <button type="button" class="btn btn-success" onclick="guardarCategoria()">   GUARDAR  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-floppy-fill" viewBox="0 0 16 16">
+            <path d="M0 1.5A1.5 1.5 0 0 1 1.5 0H3v5.5A1.5 1.5 0 0 0 4.5 7h7A1.5 1.5 0 0 0 13 5.5V0h.086a1.5 1.5 0 0 1 1.06.44l1.415 1.414A1.5 1.5 0 0 1 16 2.914V14.5a1.5 1.5 0 0 1-1.5 1.5H14v-5.5A1.5 1.5 0 0 0 12.5 9h-9A1.5 1.5 0 0 0 2 10.5V16h-.5A1.5 1.5 0 0 1 0 14.5z"/>
+            <path d="M3 16h10v-5.5a.5.5 0 0 0-.5-.5h-9a.5.5 0 0 0-.5.5zm9-16H4v5.5a.5.5 0 0 0 .5.5h7a.5.5 0 0 0 .5-.5zM9 1h2v4H9z"/>
+          </svg></button>
+          <button type="button" class="btn btn-danger" data-bs-dismiss="modal">   CANCELAR  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-circle-fill" viewBox="0 0 16 16">
+            <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0M5.354 4.646a.5.5 0 1 0-.708.708L7.293 8l-2.647 2.646a.5.5 0 0 0 .708.708L8 8.707l2.646 2.647a.5.5 0 0 0 .708-.708L8.707 8l2.647-2.646a.5.5 0 0 0-.708-.708L8 7.293z"/>
+          </svg> </button>              
+      </div>
+      </div>
+  </div>
+</div> 
+
+
+
+<!--MODAL PARA ACTUALIZAR UNA CATEGORIA-->
+  
+<div class="modal fade" id="editCa" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+      <div class="modal-header">
+          <h1 class="modal-title fs-5 w-100 m-auto" id="exampleModalLabel">ACTUALIZAR CATEGORIA</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+          <form>
+              <div class="mb-2">
+                  <label  class="form-label">NOMBRE DE CATEGORIA</label>
+                  <input type="text" class="form-control text-center" id="enombrec">
+              </div>
+          </form>                
+      </div>
+      <div class="modal-footer">
+        <input type="hidden" id="idc">
+          <button type="button" class="btn btn-success" onclick="actualizarCategoria()">   GUARDAR  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-floppy-fill" viewBox="0 0 16 16">
+            <path d="M0 1.5A1.5 1.5 0 0 1 1.5 0H3v5.5A1.5 1.5 0 0 0 4.5 7h7A1.5 1.5 0 0 0 13 5.5V0h.086a1.5 1.5 0 0 1 1.06.44l1.415 1.414A1.5 1.5 0 0 1 16 2.914V14.5a1.5 1.5 0 0 1-1.5 1.5H14v-5.5A1.5 1.5 0 0 0 12.5 9h-9A1.5 1.5 0 0 0 2 10.5V16h-.5A1.5 1.5 0 0 1 0 14.5z"/>
+            <path d="M3 16h10v-5.5a.5.5 0 0 0-.5-.5h-9a.5.5 0 0 0-.5.5zm9-16H4v5.5a.5.5 0 0 0 .5.5h7a.5.5 0 0 0 .5-.5zM9 1h2v4H9z"/>
+          </svg></button>
+          <button type="button" class="btn btn-danger" data-bs-dismiss="modal">   CANCELAR  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-circle-fill" viewBox="0 0 16 16">
+            <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0M5.354 4.646a.5.5 0 1 0-.708.708L7.293 8l-2.647 2.646a.5.5 0 0 0 .708.708L8 8.707l2.646 2.647a.5.5 0 0 0 .708-.708L8.707 8l2.647-2.646a.5.5 0 0 0-.708-.708L8 7.293z"/>
+          </svg> </button>              
+      </div>
+      </div>
+  </div>
+</div> 
+
+
+
+
+
+      <!-- Incluir CSS de DataTables -->
+      <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.css">
+      <!-- Incluir jQuery -->
+      <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+      <!-- Incluir DataTables -->
+      <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.js"></script>
+  
+      <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script src="assets/js/bootstrap.bundle.js"></script>
+    <script src="assets/js/sweetalert2.all.min.js"></script>
+    <script src="assets/js/admin.js"></script>
+</body>
+</html>

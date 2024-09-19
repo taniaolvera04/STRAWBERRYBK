@@ -1,0 +1,70 @@
+body {
+    background: rgb(255, 199, 234);
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    
+}
+
+header {
+    background-color: #f36d6d;
+    color: #fff;
+    padding: 10px;
+    text-align: center;
+}
+
+#catalogo {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    padding: 20px;
+}
+
+.prenda {
+    background-color: #fff;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    margin: 15px;
+    padding: 15px;
+    width: 300px;
+}
+
+.prenda img {
+    max-width: 100%;
+    height: auto;
+}
+
+.prenda h2 {
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+}
+
+.prenda p {
+    font-size: 1rem;
+    color: #666;
+}
+
+.prenda .botones {
+    margin-top: 10px;
+    text-align: center;
+}
+
+.prenda .boton {
+    background-color: #333;
+    color: #fff;
+    border: none;
+    padding: 8px 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.prenda .boton:hover {
+    background-color: #555;
+}
+
+
+
+#ca{
+color: rgba(243, 0, 150, 0.733);
+font-weight: bold;
+}
+

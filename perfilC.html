@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>INICIO</title>
+    <link rel="stylesheet" href="assets/css/bootstrap.min.css">
+
+    <style>
+        img {
+            padding: 10px;
+            border-radius: 100px;
+        }
+        body {
+            background: rgb(1,0,8);
+            background: radial-gradient(circle, rgba(1,0,8,1) 0%, rgba(201,63,77,1) 100%);
+        }
+        .profile-photo {
+            width: 50px;
+            height: 50px;
+            border-radius: 100%;
+        }
+        .foto-perfil {
+            height: 100px;
+            border: 1px solid white;
+        }
+        .registro-card {
+            background: rgb(65, 63, 64);
+            background: radial-gradient(circle, rgba(75, 23, 43, 0.816) 0%, rgba(217,177,255,0.7791491596638656) 100%);
+            color:white;
+        }
+    </style>
+</head>
+
+<body class="text-center" onload="cargarNombre();cargarPerfil()">
+    <nav class="navbar bg-dark border-bottom border-body" data-bs-theme="dark">
+        <div class="container-fluid">
+            <a href="cliente.html"><img src="assets/img/logo.png" alt="Logo" width="57" height="73" class="d-inline-block"></a>
+            <span class="navbar-brand h1">PERFIL</span>
+            <span class="navbar-text">
+                <a href="perfilC.html" class="text-decoration-none">
+                    <img src="assets/img/p.png" id="foto_perfil" class="profile-photo">
+                    <span class="text-white mx-3 h5" id="user">HOLA</span>
+                </a>
+                <button class="btn btn-danger" id="salir"> 
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-door-open-fill" viewBox="0 0 16 16">
+                        <path d="M1.5 15a.5.5 0 0 0 0 1h13a.5.5 0 0 0 0-1H13V2.5A1.5 1.5 0 0 0 11.5 1H11V.5a.5.5 0 0 0-.57-.495l-7 1A.5.5 0 0 0 3 1.5V15zM11 2h.5a.5.5 0 0 1 .5.5V15h-1zm-2.5 8c-.276 0-.5-.448-.5-1s.224-1 .5-1 .5.448.5 1-.224 1-.5 1"/>
+                    </svg>
+                </button>
+            </span>
+        </div>
+    </nav>
+
+    <div class="container d-flex justify-content-center align-items-center min-vh-100">
+        <div class="card p-4 registro-card" style="width: 100%; max-width: 580px;">
+            <form action="" class="w-75 m-auto" enctype="multipart/form-data" id="formPerfil" onsubmit="guardarPerfil(event)">
+                <h2 class="text-center mb-4">EDITAR PERFIL</h2>
+                <div id="foto-preview">
+                    <img src="assets/img/p.png" class="foto-perfil">
+                </div><br>
+                <label for="username">Nombre de Usuario</label>
+                <h5 id="email"></h5>
+                <label for="nombre">Nombre</label>
+                <input type="text" name="nombre" class="form-control" id="nombre" placeholder="Ingrese su nombre">
+                <label for="foto">Foto</label>
+                <input type="file" name="foto" class="form-control" id="foto"><br>
+                <button class="btn btn-primary mt-4 m-auto w-100">Guardar</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="assets/js/bootstrap.bundle.js"></script>
+    <script src="assets/js/sweetalert2.all.min.js"></script>
+    <script src="assets/js/cliente.js"></script>
+</body>
+</html>
