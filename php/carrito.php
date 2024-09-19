@@ -10,26 +10,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $action = $_POST['action'] ?? '';
 
     switch ($action) {
+       
         case "agregarC":
             $idAlbum = $_POST['id_a'] ?? '';
             $usuario = $_POST['usuario'] ?? '';
             $cantidad = (int) ($_POST['cantidad'] ?? 1);
-        
+            
             // Obtener ID de usuario
             $stmtUsuario = $cx->prepare("SELECT id_u FROM usuarios WHERE usuario = ?");
             $stmtUsuario->bind_param("s", $usuario);
             $stmtUsuario->execute();
             $resultadoUsuario = $stmtUsuario->get_result();
-        
+            
             if ($resultadoUsuario->num_rows > 0) {
                 $idUsuario = $resultadoUsuario->fetch_assoc()['id_u'];
-        
+                
                 // Comprobar si el álbum ya está en el carrito
                 $stmtAlbum = $cx->prepare("SELECT id_ca, cantidad FROM carrito WHERE id_u = ? AND id_a = ?");
                 $stmtAlbum->bind_param("ii", $idUsuario, $idAlbum);
                 $stmtAlbum->execute();
                 $resultadoAlbum = $stmtAlbum->get_result();
-        
+                
                 if ($resultadoAlbum->num_rows > 0) {
                     // Actualizar cantidad
                     $rowAlbum = $resultadoAlbum->fetch_assoc();
@@ -45,21 +46,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $stmtNuevoAlbum->bind_param("i", $idAlbum);
                     $stmtNuevoAlbum->execute();
                     $rowAlbum = $stmtNuevoAlbum->get_result()->fetch_assoc();
-        
+                    
                     if ($rowAlbum) {
+                        // Insertar en carrito
                         $stmtInsert = $cx->prepare("INSERT INTO carrito (id_a, nombrea, precio, cantidad, id_u) VALUES (?, ?, ?, ?, ?)");
                         $stmtInsert->bind_param("issdi", $idAlbum, $rowAlbum['nombrea'], $rowAlbum['precio'], $cantidad, $idUsuario);
                         $valido['success'] = $stmtInsert->execute();
-                        $valido['mensaje'] = $valido['success'] ? "Álbum agregado al carrito" : "Error al agregar al carrito";
-        
-                        // Guardar en orden y detalle_o al agregar al carrito
+                        
                         if ($valido['success']) {
-                            $totalCompra = $rowAlbum['precio'] * $cantidad;
-                            $fechaHora = date("Y-m-d H:i:s");
+                            // Obtener el id_ca del último álbum agregado al carrito
+                            $idCa = $cx->insert_id; // id_ca
         
                             // Insertar en la tabla orden
-                            $stmtOrden = $cx->prepare("INSERT INTO orden (id_u, total, fecha_o) VALUES (?, ?, ?)");
-                            $stmtOrden->bind_param("ids", $idUsuario, $totalCompra, $fechaHora);
+                            $totalCompra = $rowAlbum['precio'] * $cantidad;
+                            $fechaHora = date("Y-m-d H:i:s");
+                            
+                            $stmtOrden = $cx->prepare("INSERT INTO orden (id_u, nombrea, cantidad, total, fecha_o) VALUES (?, ?, ?, ?, ?)");
+                            $stmtOrden->bind_param("isids", $idUsuario, $rowAlbum['nombrea'], $cantidad, $totalCompra, $fechaHora);
                             $stmtOrden->execute();
                             $idOrden = $cx->insert_id; // Obtener el ID de la nueva orden
         
@@ -67,10 +70,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             $stmtDetalleO = $cx->prepare("INSERT INTO detalle_o (id_o, id_a, cantidad, fechahr) VALUES (?, ?, ?, ?)");
                             $stmtDetalleO->bind_param("iiis", $idOrden, $idAlbum, $cantidad, $fechaHora);
                             $stmtDetalleO->execute();
-
-                            $stmtDetalleO = $cx->prepare("INSERT INTO detalle_ca (id_ca id_a, cantidad, fechahr) VALUES (?, ?, ?,?)");
-                            $stmtDetalleO->bind_param("iiis", $idOrden, $idAlbum, $cantidad, $fechaHora);
-                            $stmtDetalleO->execute();
+        
+                            // Insertar en detalle_ca
+                            $stmtDetalleCA = $cx->prepare("INSERT INTO detalle_ca (id_ca, id_a, cantidad, fechahr) VALUES (?, ?, ?, ?)");
+                            $stmtDetalleCA->bind_param("iiis", $idCa, $idAlbum, $cantidad, $fechaHora);
+                            if (!$stmtDetalleCA->execute()) {
+                                error_log("Error inserting into detalle_ca: " . $stmtDetalleCA->error);
+                            }
+                        } else {
+                            $valido['mensaje'] = "Error al agregar al carrito";
                         }
                     } else {
                         $valido['mensaje'] = "Álbum no encontrado";
@@ -80,6 +88,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $valido['mensaje'] = "Usuario no encontrado";
             }
             break;
+        
         
 
         case "eliminarC":

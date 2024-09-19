@@ -725,79 +725,70 @@ const mostrarUsu=async()=>{
 
 
 
-
-
-
-
-//MOSTRAR TODOS LOS MOVIMIENTOS
-
-const cargarOrden = async () => {
+const mostrarOrden = async () => {
     const datos = new FormData();
-    datos.append("action", "selectOrd");
-
+    datos.append("action", "selectAllOr");
+    
     try {
         let respuesta = await fetch("php/metodosA.php", { method: 'POST', body: datos });
         let json = await respuesta.json();
 
-        if (json.success) {
-            let tablaHTML = `
-                <table id="tablaM" class="table table-striped w-75 text-center">
-                    <thead>
-                        <tr>
-                            <th>ID USUARIO</th>
-                            <th>TIPO DE MOVIMIENTO</th>
-                            <th>NOMBRE PRENDA</th>
-                            <th>CANTIDAD</th>
-                            <th>TALLA</th>
-                            <th>FECHA</th>
-                           
-                        </tr>
-                    </thead>
-                    <tbody>
-            `;
-
-            json.data.forEach(item => {
-                tablaHTML += `
+        let tablaHTML = `
+            <table id="tablaO" class="table table-striped w-75 text-center">
+                <thead>
                     <tr>
-                        <td>${item.id_u}</td>
-                        <td>${item.tipomov}</td>
-                        <td>${item.nombrep}</td>
-                        <td>${item.cantidad}</td>
-                        <td>${item.talla}</td>
-                        <td>${item.fecha}</td>
-                       
+                        <th>ID ORDEN</th>
+                        <th>ID USUARIO</th>
+                        <th>NOMBRE ALBUM</th>
+                        <th>CANTIDAD</th>
+                        <th>TOTAL</th>
+                        <th>FECHA</th>
                     </tr>
-                `;
-            });
+                </thead>
+                <tbody id="listaOrden">
+        `;
 
-            tablaHTML += `</tbody></table>`;
-            document.getElementById("action").innerHTML = tablaHTML;
+        json.data.forEach(item => {
+            tablaHTML += `
+                <tr>
+                    <td>${item[0]}</td>
+                    <td>${item[1]}</td>
+                    <td>${item[2]}</td>
+                    <td>${item[3]}</td>
+                    <td>$${item[4].toFixed(2)}</td>
+                    <td>${new Date(item[5]).toLocaleString()}</td>
+                </tr>
+            `;
+        });
 
-            if ($.fn.DataTable.isDataTable("#tablaM")) {
-                $("#tablaM").DataTable().destroy();
-            }
+        tablaHTML += `</tbody></table>`;
 
-            $("#tablaM").DataTable({
-                lengthMenu: [5, 10, 25, 50, 100],
-                language: {
-                    lengthMenu: "Mostrar _MENU_ registros por página",
-                    zeroRecords: "No se encontraron resultados",
-                    info: "Mostrando _START_ a _END_ de _TOTAL_ registros",
-                    infoEmpty: "No hay registros disponibles",
-                    infoFiltered: "(filtrados de _MAX_ registros totales)",
-                    search: "Buscar:",
-                    paginate: {
-                        first: "Primero",
-                        last: "Último",
-                        next: "Siguiente",
-                        previous: "Anterior"
-                    }
-                }
-            });
-        } else {
-            console.error("Error al cargar movimientos:", json.mensaje);
+        document.getElementById("action").innerHTML = tablaHTML;
+
+        if ($.fn.DataTable.isDataTable("#tablaO")) {
+            $("#tablaO").DataTable().destroy();
         }
+
+        $("#tablaO").DataTable({
+            lengthMenu: [5, 10, 25, 50, 100],
+            language: {
+                lengthMenu: "Mostrar _MENU_ registros por página",
+                zeroRecords: "No se encontraron resultados",
+                info: "Mostrando _START_ a _END_ de _TOTAL_ registros",
+                infoEmpty: "No hay registros disponibles",
+                infoFiltered: "(filtrados de _MAX_ registros totales)",
+                search: "Buscar:",
+                paginate: {
+                    first: "Primero",
+                    last: "Último",
+                    next: "Siguiente",
+                    previous: "Anterior"
+                }
+            }
+        });
+
     } catch (error) {
-        console.error("Error en la solicitud:", error);
+        console.error("Error al cargar órdenes:", error);
     }
 };
+

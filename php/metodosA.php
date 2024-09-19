@@ -311,6 +311,29 @@ break;
             
             break;
 
+            case "selectAllOr":
+                $sql = "SELECT id_o, id_u, nombrea, cantidad, total, fecha_o FROM orden";
+                $registros = array('data' => array());
+    
+                $res = $cx->query($sql);
+                if ($res && $res->num_rows > 0) {
+                    while ($row = $res->fetch_assoc()) {
+                        // Ensure to format data as needed
+                        $registros['data'][] = array(
+                            $row['id_o'],
+                            $row['id_u'],
+                            $row['nombrea'],
+                            $row['cantidad'],
+                            floatval($row['total']),
+                            $row['fecha_o'] // Keeping as is for date
+                        );
+                    }
+                }
+    
+                echo json_encode($registros);
+                break;
+    
+            
 }
 
 } else {

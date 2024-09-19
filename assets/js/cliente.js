@@ -168,7 +168,6 @@ function mostrarCarrito(carrito) {
         const row = document.createElement('tr');
         row.innerHTML = `
             <td>${index + 1}</td>
-            <td><img src="php/${producto.fotoa || 'default.jpg'}" alt="${producto.nombrea}" height="50px"></td>
             <td>${producto.nombrea}</td>
             <td>$${producto.precio.toFixed(2)}</td>
             <td>${producto.cantidad}</td>
