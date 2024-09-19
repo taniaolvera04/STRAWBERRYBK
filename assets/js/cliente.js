@@ -1,44 +1,39 @@
-var action=document.getElementById("action");
+var action = document.getElementById("action");
+var sesion = localStorage.getItem('usuario') || "null";
 
-var sesion=localStorage.getItem('usuario') || "null";
-
-if(sesion=="null"){
-    window.location.href="index.html"
+if (sesion === "null") {
+    window.location.href = "index.html";
 }
 
+const cargarNombre = async () => {
+    const datos = new FormData();
+    datos.append("usuario", sesion);
+    datos.append("action", "select");
 
-const cargarNombre=async()=>{
+    let respuesta = await fetch("php/loginUsuario.php", { method: 'POST', body: datos });
+    let json = await respuesta.json();
 
-    datos=new FormData();
-    datos.append("usuario",sesion);
-    datos.append("action","select");
-
-    let respuesta=await fetch("php/loginUsuario.php",{method:'POST',body:datos});
-    let json=await respuesta.json();
-
-    if(json.success==true){
-        document.getElementById("user").innerHTML=json.mensaje;
-        document.getElementById("foto_perfil").src="php/"+json.foto;
-    }else{
-    Swal.fire({title:"ERROR",text:json.mensaje,icon:"error"});
+    if (json.success) {
+        document.getElementById("user").innerHTML = json.mensaje;
+        document.getElementById("foto_perfil").src = "php/" + json.foto;
+    } else {
+        Swal.fire({ title: "ERROR", text: json.mensaje, icon: "error" });
     }
-}
+};
 
-document.getElementById("salir").onclick=()=>{
+document.getElementById("salir").onclick = () => {
     Swal.fire({
-        title:"¿Está seguro de Cerrar Sesión?",
-        showDenyButton:true,
-        confirmButtonText:"Si",
-        denyButtonText:`No`
-    }).then((result)=>{
-if(result.isConfirmed){
-localStorage.clear();
-window.location.href="index.html"
-}
-});
-}
-
-
+        title: "¿Está seguro de Cerrar Sesión?",
+        showDenyButton: true,
+        confirmButtonText: "Si",
+        denyButtonText: `No`
+    }).then((result) => {
+        if (result.isConfirmed) {
+            localStorage.clear();
+            window.location.href = "index.html";
+        }
+    });
+};
 
 const cargarPerfil = async () => {
     const datos = new FormData();
@@ -64,7 +59,7 @@ const cargarPerfil = async () => {
 };
 
 const guardarPerfil = async (event) => {
-    event.preventDefault(); // Prevenir el comportamiento por defecto del formulario
+    event.preventDefault();
 
     const formPerfil = document.getElementById("formPerfil");
     const datos = new FormData(formPerfil);
@@ -77,7 +72,6 @@ const guardarPerfil = async (event) => {
 
         if (json.success) {
             Swal.fire({ title: "¡ÉXITO!", text: json.mensaje, icon: "success" });
-            // Actualiza la imagen de perfil en la página sin recargar
             document.getElementById("foto-preview").innerHTML = `<img src="php/${json.foto}" class="foto-perfil">`;
             document.getElementById("foto_perfil").src = `php/${json.foto}`;
         } else {
@@ -88,7 +82,6 @@ const guardarPerfil = async (event) => {
         Swal.fire({ title: "ERROR", text: "Hubo un problema con la conexión", icon: "error" });
     }
 };
-
 
 const cargarCatalogo = async () => {
     try {
@@ -118,7 +111,7 @@ const cargarCatalogo = async () => {
     } catch (error) {
         console.error('Error al cargar el catálogo:', error);
     }
-}
+};
 
 // CARRITO
 
@@ -138,16 +131,14 @@ function restarCantidad(idProducto) {
     }
 }
 
-let productosEnCarrito = [];
-
-async function agregarCarrito(idProducto) {
-    const cantidad = document.getElementById(`cantidad-${idProducto}`).value;
-    const usuario = sesion;
+async function agregarCarrito(idAlbum) {
+    const inputCantidad = document.getElementById(`cantidad-${idAlbum}`);
+    const cantidad = inputCantidad.value;
 
     const formData = new FormData();
     formData.append('action', 'agregarC');
-    formData.append('id_a', idProducto);
-    formData.append('usuario', usuario);
+    formData.append('id_a', idAlbum);
+    formData.append('usuario', sesion);
     formData.append('cantidad', cantidad);
 
     try {
@@ -159,9 +150,8 @@ async function agregarCarrito(idProducto) {
         const json = await respuesta.json();
 
         if (json.success) {
-            Swal.fire({ title: '¡ÉXITO!', text: json.mensaje, icon: 'success' }).then(() => {
-                obtenerCarrito();
-            });
+            await obtenerCarrito(); // Actualiza el carrito
+            Swal.fire({ title: '¡ÁLBUM AGREGADO!', text: 'El álbum fue agregado exitosamente', icon: 'success' });
         } else {
             Swal.fire({ title: 'Error', text: json.mensaje, icon: 'error' });
         }
@@ -172,70 +162,11 @@ async function agregarCarrito(idProducto) {
 }
 
 
-async function obtenerCarrito() {
-    const usuario = localStorage.getItem('usuario');
 
+async function obtenerCarrito() {
     const formData = new FormData();
     formData.append('action', 'listarC');
-    formData.append('usuario', usuario);
-
-    try {
-        const respuesta = await fetch('php/carrito.php', {
-            method: 'POST',
-            body: formData
-        });
-
-        if (!respuesta.ok) {
-            throw new Error('Network response was not ok');
-        }
-
-        const json = await respuesta.json(); // Directly parse as JSON
-
-        if (json.success) {
-            productosEnCarrito = json.carrito;
-            mostrarCarrito(productosEnCarrito);
-
-            let totalCarrito = json.total;
-            const totalCarritoDisplay = document.getElementById('total-carrito-display');
-            if (totalCarritoDisplay) {
-                totalCarritoDisplay.textContent = `$${totalCarrito.toFixed(2)}`;
-            }
-        } else {
-            Swal.fire({ title: 'Error', text: json.mensaje, icon: 'error' });
-        }
-    } catch (error) {
-        console.error('Error al obtener el carrito:', error);
-        Swal.fire({ title: 'Error', text: 'Hubo un problema al intentar obtener el carrito', icon: 'error' });
-    }
-}
-
-
-
-
-function mostrarCarrito(carrito) {
-    const tbody = document.getElementById('carrito-table-body');
-    tbody.innerHTML = '';
-
-    carrito.forEach((producto, index) => {
-        const row = document.createElement('tr');
-        row.innerHTML = `
-            <td>${index + 1}</td>
-            <td>${producto.nombrea}</td>
-            <td>$${producto.precio.toFixed(2)}</td>
-            <td>${producto.cantidad}</td>
-            <td>
-                <button class="btn btn-danger" onclick="eliminarDelCarrito(${producto.id_ca})">Eliminar</button>
-            </td>
-        `;
-        tbody.appendChild(row);
-    });
-}
-
-// Función para eliminar un producto del carrito
-async function eliminarDelCarrito(idCarrito) {
-    const formData = new FormData();
-    formData.append('action', 'eliminarC');
-    formData.append('id_ca', idCarrito);
+    formData.append('usuario', sesion);
 
     try {
         const respuesta = await fetch('php/carrito.php', {
@@ -246,17 +177,88 @@ async function eliminarDelCarrito(idCarrito) {
         const json = await respuesta.json();
 
         if (json.success) {
-            Swal.fire({ title: 'Eliminado del carrito', text: json.mensaje, icon: 'success' }).then(() => {
-                obtenerCarrito();
-            });
+            mostrarCarrito(json.carrito);
         } else {
             Swal.fire({ title: 'Error', text: json.mensaje, icon: 'error' });
         }
     } catch (error) {
-        console.error('Error al eliminar del carrito:', error);
-        Swal.fire({ title: 'Error', text: 'Hubo un problema al intentar eliminar del carrito', icon: 'error' });
+        console.error('Error al obtener el carrito:', error);
+        Swal.fire({ title: 'Error', text: error.message, icon: 'error' });
     }
 }
+
+
+
+function mostrarCarrito(carrito) {
+    const tbody = document.getElementById('carrito-table-body');
+    tbody.innerHTML = '';
+
+    let total = 0;
+
+    if (carrito.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6">El carrito está vacío</td></tr>';
+        document.getElementById('total-carrito-display').innerText = '$0';
+        return;
+    }
+
+    carrito.forEach((producto, index) => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${index + 1}</td>
+            <td>${producto.nombrea}</td>
+            <td>$${producto.precio}</td>
+            <td>${producto.cantidad}</td>
+            <td>
+                <button class="btn btn-danger" onclick="eliminarDelCarrito(${producto.id_ca})">Eliminar</button>
+            </td>
+        `;
+        tbody.appendChild(row);
+
+        total += producto.precio * producto.cantidad;
+    });
+
+    document.getElementById('total-carrito-display').innerText = `$${total.toFixed(2)}`;
+}
+
+// Función para eliminar un producto del carrito
+async function eliminarDelCarrito(idCarrito) {
+    const result = await Swal.fire({
+        title: '¿Está seguro de eliminar este álbum?',
+        text: "Esta acción no se puede deshacer.",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Sí, eliminar',
+        cancelButtonText: 'No estoy seguro'
+    });
+
+    if (result.isConfirmed) {
+        const formData = new FormData();
+        formData.append('action', 'eliminarC');
+        formData.append('id_ca', idCarrito);
+
+        try {
+            const respuesta = await fetch('php/carrito.php', {
+                method: 'POST',
+                body: formData
+            });
+
+            const json = await respuesta.json();
+
+            if (json.success) {
+                await obtenerCarrito(); // Actualiza el carrito
+                Swal.fire({ title: 'Eliminado del carrito', text: json.mensaje, icon: 'success' });
+            } else {
+                Swal.fire({ title: 'Error', text: json.mensaje, icon: 'error' });
+            }
+        } catch (error) {
+            console.error('Error al eliminar del carrito:', error);
+            Swal.fire({ title: 'Error', text: 'Hubo un problema al intentar eliminar del carrito', icon: 'error' });
+        }
+    }
+}
+
+
+
 
 // Confirmar compra
 async function confirmarCompra() {
@@ -286,11 +288,7 @@ async function confirmarCompra() {
 }
 
 function limpiarCarrito() {
-    productosEnCarrito = [];
     const carritoDiv = document.getElementById('carrito-table-body');
     carritoDiv.innerHTML = '';
-    const carritoDisplay = document.getElementById('total-carrito-display');
-    carritoDisplay.innerHTML = '';
+    document.getElementById('total-carrito-display').innerText = '$0';
 }
-
-

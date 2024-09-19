@@ -10,7 +10,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $action = $_POST['action'] ?? '';
 
     switch ($action) {
-       
         case "agregarC":
             $idAlbum = $_POST['id_a'] ?? '';
             $usuario = $_POST['usuario'] ?? '';
@@ -35,7 +34,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     // Actualizar cantidad
                     $rowAlbum = $resultadoAlbum->fetch_assoc();
                     $nuevaCantidad = $rowAlbum['cantidad'] + $cantidad;
-        
+
                     $stmtUpdate = $cx->prepare("UPDATE carrito SET cantidad = ? WHERE id_ca = ?");
                     $stmtUpdate->bind_param("ii", $nuevaCantidad, $rowAlbum['id_ca']);
                     $valido['success'] = $stmtUpdate->execute();
@@ -56,11 +55,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         if ($valido['success']) {
                             // Obtener el id_ca del último álbum agregado al carrito
                             $idCa = $cx->insert_id; // id_ca
-        
-                            // Insertar en la tabla orden
                             $totalCompra = $rowAlbum['precio'] * $cantidad;
                             $fechaHora = date("Y-m-d H:i:s");
                             
+                            // Insertar en orden
                             $stmtOrden = $cx->prepare("INSERT INTO orden (id_u, nombrea, cantidad, total, fecha_o) VALUES (?, ?, ?, ?, ?)");
                             $stmtOrden->bind_param("isids", $idUsuario, $rowAlbum['nombrea'], $cantidad, $totalCompra, $fechaHora);
                             $stmtOrden->execute();
@@ -88,8 +86,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $valido['mensaje'] = "Usuario no encontrado";
             }
             break;
-        
-        
 
         case "eliminarC":
             $idCarrito = $_POST['id_ca'] ?? '';
@@ -120,7 +116,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
             if ($resultadoUsuario->num_rows > 0) {
                 $idUsuario = $resultadoUsuario->fetch_assoc()['id_u'];
-                $stmtCarrito = $cx->prepare("SELECT id_ca, id_a, fotoa, nombrea, precio, cantidad FROM carrito WHERE id_u = ?");
+                $stmtCarrito = $cx->prepare("SELECT id_ca, id_a, nombrea, precio, cantidad FROM carrito WHERE id_u = ?");
                 $stmtCarrito->bind_param("i", $idUsuario);
                 $stmtCarrito->execute();
                 $resultadoCarrito = $stmtCarrito->get_result();
@@ -135,48 +131,50 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             } else {
                 echo json_encode(['success' => false, 'mensaje' => "Usuario no encontrado"]);
             }
+            exit;
             break;
 
-            case "confirmarCompra":
-                $usuario = $_POST['usuario'] ?? '';
-                $stmtUsuario = $cx->prepare("SELECT id_u FROM usuarios WHERE usuario = ?");
-                $stmtUsuario->bind_param("s", $usuario);
-                $stmtUsuario->execute();
-                $resultadoUsuario = $stmtUsuario->get_result();
-            
-                if ($resultadoUsuario->num_rows > 0) {
-                    $idUsuario = $resultadoUsuario->fetch_assoc()['id_u'];
-            
-                    // Obtener todos los álbumes en el carrito
-                    $stmtCarrito = $cx->prepare("SELECT id_ca, id_a FROM carrito WHERE id_u = ?");
-                    $stmtCarrito->bind_param("i", $idUsuario);
-                    $stmtCarrito->execute();
-                    $resultadoCarrito = $stmtCarrito->get_result();
-            
-                    if ($resultadoCarrito->num_rows > 0) {
-                        // Eliminar del carrito
-                        $stmtDeleteCarrito = $cx->prepare("DELETE FROM carrito WHERE id_u = ?");
-                        $stmtDeleteCarrito->bind_param("i", $idUsuario);
-                        $stmtDeleteCarrito->execute();
-            
-                        // Eliminar detalles de cada álbum en detalle_ca
-                        while ($rowCarrito = $resultadoCarrito->fetch_assoc()) {
-                            $idCarrito = $rowCarrito['id_ca']; // Obtener id_ca
-                            $stmtDeleteDetalle = $cx->prepare("DELETE FROM detalle_ca WHERE id_ca = ?");
-                            $stmtDeleteDetalle->bind_param("i", $idCarrito);
-                            $stmtDeleteDetalle->execute();
-                        }
-            
-                        $valido['success'] = true;
-                        $valido['mensaje'] = "Compra confirmada. Se eliminaron los productos del carrito y sus detalles.";
-                    } else {
-                        $valido['mensaje'] = "El carrito está vacío.";
+        case "confirmarCompra":
+            $usuario = $_POST['usuario'] ?? '';
+            $stmtUsuario = $cx->prepare("SELECT id_u FROM usuarios WHERE usuario = ?");
+            $stmtUsuario->bind_param("s", $usuario);
+            $stmtUsuario->execute();
+            $resultadoUsuario = $stmtUsuario->get_result();
+        
+            if ($resultadoUsuario->num_rows > 0) {
+                $idUsuario = $resultadoUsuario->fetch_assoc()['id_u'];
+        
+                // Obtener todos los álbumes en el carrito
+                $stmtCarrito = $cx->prepare("SELECT id_ca, id_a FROM carrito WHERE id_u = ?");
+                $stmtCarrito->bind_param("i", $idUsuario);
+                $stmtCarrito->execute();
+                $resultadoCarrito = $stmtCarrito->get_result();
+        
+                if ($resultadoCarrito->num_rows > 0) {
+                    // Eliminar del carrito
+                    $stmtDeleteCarrito = $cx->prepare("DELETE FROM carrito WHERE id_u = ?");
+                    $stmtDeleteCarrito->bind_param("i", $idUsuario);
+                    $stmtDeleteCarrito->execute();
+        
+                    // Eliminar detalles de cada álbum en detalle_ca
+                    while ($rowCarrito = $resultadoCarrito->fetch_assoc()) {
+                        $idCarrito = $rowCarrito['id_ca']; // Obtener id_ca
+                        $stmtDeleteDetalle = $cx->prepare("DELETE FROM detalle_ca WHERE id_ca = ?");
+                        $stmtDeleteDetalle->bind_param("i", $idCarrito);
+                        $stmtDeleteDetalle->execute();
                     }
+        
+                    $valido['success'] = true;
+                    $valido['mensaje'] = "Compra confirmada. Se eliminaron los productos del carrito y sus detalles.";
                 } else {
-                    $valido['mensaje'] = "Usuario no encontrado.";
+                    $valido['mensaje'] = "El carrito está vacío.";
                 }
-                break;
-            
+            } else {
+                $valido['mensaje'] = "Usuario no encontrado.";
+            }
+            break;
+        
+     
     }
 } else {
     $valido['mensaje'] = "Método no permitido";
