@@ -87,6 +87,10 @@ const guardarPerfil = async (event) => {
 };
 
 
+
+
+
+
 function cargarCatalogo() {
     fetch('php/metodosC.php')
         .then(response => response.json())
@@ -102,7 +106,7 @@ function cargarCatalogo() {
                     <p>${album.descripcion}</p>
                     <p>Precio: $${album.precio}</p>
                     <p>Cantidad: ${album.cantidada}</p>
-                    
+                   
                     <div class="input-group mb-3">
                         <button class="btn btn-outline-secondary" type="button" onclick="restarCantidad(${album.id_a})">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-dash" viewBox="0 0 16 16">
@@ -132,236 +136,218 @@ function cargarCatalogo() {
             });
         })
         .catch(error => console.error('Error al cargar el catálogo:', error));
-}
+    }
 
-
-
-
-//CARRITO 
-
-function sumarCantidad(idProducto) {
-    const inputCantidad = document.getElementById(`cantidad-${idProducto}`);
-    let cantidad = parseInt(inputCantidad.value, 10);
-    cantidad++;
-    inputCantidad.value = cantidad;
-}
-
-
-function restarCantidad(idProducto) {
-    const inputCantidad = document.getElementById(`cantidad-${idProducto}`);
-    let cantidad = parseInt(inputCantidad.value, 10);
-    if (cantidad > 1) {
-        cantidad--;
+    //CARRITO
+    
+    function sumarCantidad(idAlbum) {
+        const inputCantidad = document.getElementById(`cantidad-${idAlbum}`);
+        let cantidad = parseInt(inputCantidad.value, 10);
+        cantidad++;
         inputCantidad.value = cantidad;
     }
-}
-
-
-let productosEnCarrito = [];
-
-function mostrarCarrito() {
-    const tbody = document.getElementById('carrito-table-body');
-    tbody.innerHTML = ''; 
-
-    productosEnCarrito.forEach((producto, index) => {
-        const row = document.createElement('tr');
-        row.innerHTML = `
-            <td>${index + 1}</td>
-            <td><img src="${producto.fotop}" alt="${producto.nombrep}" height="50px"></td>
-            <td>${producto.nombrep}</td>
-            <td>${producto.talla}</td>
-            <td>$${producto.precio}</td>
-            <td>${producto.cantidad}</td>
-            <td><button class="btn btn-danger" onclick="eliminarDelCarrito(${producto.id_carrito})">Eliminar</button></td>
-        `;
-        tbody.appendChild(row);
-    });
-}
-
-
-
-async function agregarCarrito(idProducto) {
-    const cantidad = document.getElementById(`cantidad-${idProducto}`).value;
-    const usuario = localStorage.getItem('usuario'); 
-
-    const formData = new FormData();
-    formData.append('action', 'agregarC');
-    formData.append('id_p', idProducto);
-    formData.append('usuario', usuario);
-    formData.append('cantidad', cantidad);
-
-    try {
-        const respuesta = await fetch('php/carrito.php', {
-            method: 'POST',
-            body: formData
-        });
-
-        const textoRespuesta = await respuesta.text(); // Obtener el texto de la respuesta
-        console.log('Respuesta del servidor:', textoRespuesta); // Imprimir la respuesta recibida
-
-        const json = JSON.parse(textoRespuesta); // Intentar parsear la respuesta como JSON
-
-        if (json.success) {
-            Swal.fire({
-                title: '¡ÉXITO!',
-                text: json.mensaje,
-                icon: 'success'
-            }).then(() => {
-              obtenerCarrito();
-            });
-        } else {
-            Swal.fire({
-                title: 'Error',
-                text: json.mensaje,
-                icon: 'error'
-            });
-        }
-    } catch (error) {
-        console.error('Error al agregar al carrito:', error);
-        Swal.fire({
-            title: 'Error',
-            text: 'Hubo un problema al intentar agregar al carrito',
-            icon: 'error'
-        });
-    }
-}
-
-
-async function obtenerCarrito() {
-    const usuario = localStorage.getItem('usuario');
-
-    const formData = new FormData();
-    formData.append('action', 'listarC');
-    formData.append('usuario', usuario);
-
-    try {
-        const respuesta = await fetch('php/carrito.php', {
-            method: 'POST',
-            body: formData
-        });
-
-        const json = await respuesta.json();
-
-        if (json.success) {
-            productosEnCarrito = json.carrito;
-            mostrarCarrito();
-
-            // Calcular y mostrar el total del carrito
-            let totalCarrito = json.total;
-            // Puedes formatear el total según sea necesario
-            const totalCarritoDisplay = document.getElementById('total-carrito-display');
-            if (totalCarritoDisplay) {
-                totalCarritoDisplay.textContent = `$${totalCarrito}`;
-            } else {
-                console.error('Elemento para mostrar el total no encontrado');
-            }
-        } else {
-            Swal.fire({
-                title: 'Error',
-                text: json.mensaje,
-                icon: 'error'
-            });
-        }
-    } catch (error) {
-        console.error('Error al obtener el carrito:', error);
-        Swal.fire({
-            title: 'Error',
-            text: 'Hubo un problema al intentar obtener el carrito',
-            icon: 'error'
-        });
-    }
-}
-
-
-
-// Función para eliminar un producto del carrito
-async function eliminarDelCarrito(idCarrito) {
-    const formData = new FormData();
-    formData.append('action', 'eliminarC');
-    formData.append('id_carrito', idCarrito);
-
-    try {
-        const respuesta = await fetch('php/carrito.php', {
-            method: 'POST',
-            body: formData
-        });
-
-        const json = await respuesta.json();
-
-        if (json.success) {
-            Swal.fire({
-                title: 'Eliminado del carrito',
-                text: json.mensaje,
-                icon: 'success'
-            }).then(() => {
-                // Actualizar la interfaz del carrito mostrando los productos actualizados
-                obtenerCarrito();
-            });
-        } else {
-            Swal.fire({
-                title: 'Error',
-                text: json.mensaje,
-                icon: 'error'
-            });
-        }
-    } catch (error) {
-        console.error('Error al eliminar del carrito:', error);
-        Swal.fire({
-            title: 'Error',
-            text: 'Hubo un problema al intentar eliminar del carrito',
-            icon: 'error'
-        });
-    }
-}
-
-
-async function confirmarCompra() {
-    const usuario = 'nombreUsuario'; // Reemplaza 'nombreUsuario' con la lógica para obtener el nombre de usuario
-    const formData = new FormData();
-    formData.append('action', 'confirmarCompra');
-    formData.append('usuario', sesion); // Envía el nombre de usuario al servidor
-
-    try {
-        const respuesta = await fetch('php/carrito.php', {
-            method: 'POST',
-            body: formData
-        });
-
-        const json = await respuesta.json();
-
-        if (json.success) {
-            Swal.fire({
-                title: 'Compra Confirmada',
-                text: json.mensaje,
-                icon: 'success'
-            }).then(() => {
-                limpiarCarrito();
-            });
-        } else {
-            Swal.fire({
-                title: 'Error',
-                text: json.mensaje,
-                icon: 'error'
-            });
-        }
-    } catch (error) {
-        console.error('Error al confirmar la compra:', error);
-        Swal.fire({
-            title: 'Error',
-            text: 'Hubo un problema al intentar confirmar la compra',
-            icon: 'error'
-        });
-    }
-}
-
-
-
-function limpiarCarrito() {
     
-    productosEnCarrito = [];
-    const carritoDiv = document.getElementById('carrito-table-body');
-    carritoDiv.innerHTML = '';
-    const carritoDisplay = document.getElementById('total-carrito-display');
-    carritoDisplay.innerHTML = '';
-}
-
+    function restarCantidad(idAlbum) {
+        const inputCantidad = document.getElementById(`cantidad-${idAlbum}`);
+        let cantidad = parseInt(inputCantidad.value, 10);
+        if (cantidad > 1) {
+            cantidad--;
+            inputCantidad.value = cantidad;
+        }
+    }
+    
+    let albumsEnCarrito = [];
+    
+    function mostrarCarrito() {
+        const tbody = document.getElementById('carrito-table-body');
+        tbody.innerHTML = ''; 
+    
+        albumsEnCarrito.forEach((album, index) => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${index + 1}</td>
+                <td><img src="${album.fotoa}" alt="${album.nombrea}" height="50px"></td>
+                <td>${album.nombrea}</td>
+                <td>$${album.precio}</td>
+                <td>${album.cantidad}</td>
+                <td><button class="btn btn-danger" onclick="eliminarDelCarrito(${album.id_carrito})">Eliminar</button></td>
+            `;
+            tbody.appendChild(row);
+        });
+    }
+    
+    async function agregarCarrito(idAlbum) {
+        const cantidad = document.getElementById(`cantidad-${idAlbum}`).value;
+        const usuario = localStorage.getItem('usuario'); 
+    
+        const formData = new FormData();
+        formData.append('action', 'agregarC');
+        formData.append('id_a', idAlbum); // Cambiado a id_a
+        formData.append('usuario', usuario);
+        formData.append('cantidad', cantidad);
+    
+        try {
+            const respuesta = await fetch('php/carrito.php', {
+                method: 'POST',
+                body: formData
+            });
+    
+            const textoRespuesta = await respuesta.text();
+            console.log('Respuesta del servidor:', textoRespuesta);
+    
+            const json = JSON.parse(textoRespuesta);
+    
+            if (json.success) {
+                Swal.fire({
+                    title: '¡ÉXITO!',
+                    text: json.mensaje,
+                    icon: 'success'
+                }).then(() => {
+                  obtenerCarrito();
+                });
+            } else {
+                Swal.fire({
+                    title: 'Error',
+                    text: json.mensaje,
+                    icon: 'error'
+                });
+            }
+        } catch (error) {
+            console.error('Error al agregar al carrito:', error);
+            Swal.fire({
+                title: 'Error',
+                text: 'Hubo un problema al intentar agregar al carrito',
+                icon: 'error'
+            });
+        }
+    }
+    
+    async function obtenerCarrito() {
+        const usuario = localStorage.getItem('usuario');
+    
+        const formData = new FormData();
+        formData.append('action', 'listarC');
+        formData.append('usuario', usuario);
+    
+        try {
+            const respuesta = await fetch('php/carrito.php', {
+                method: 'POST',
+                body: formData
+            });
+    
+            const json = await respuesta.json();
+    
+            if (json.success) {
+                albumsEnCarrito = json.carrito;
+                mostrarCarrito();
+    
+                let totalCarrito = json.total;
+                const totalCarritoDisplay = document.getElementById('total-carrito-display');
+                if (totalCarritoDisplay) {
+                    totalCarritoDisplay.textContent = `$${totalCarrito}`;
+                } else {
+                    console.error('Elemento para mostrar el total no encontrado');
+                }
+            } else {
+                Swal.fire({
+                    title: 'Error',
+                    text: json.mensaje,
+                    icon: 'error'
+                });
+            }
+        } catch (error) {
+            console.error('Error al obtener el carrito:', error);
+            Swal.fire({
+                title: 'Error',
+                text: 'Hubo un problema al intentar obtener el carrito',
+                icon: 'error'
+            });
+        }
+    }
+    
+    // Función para eliminar un producto del carrito
+    async function eliminarDelCarrito(idCarrito) {
+        const formData = new FormData();
+        formData.append('action', 'eliminarC');
+        formData.append('id_carrito', idCarrito);
+    
+        try {
+            const respuesta = await fetch('php/carrito.php', {
+                method: 'POST',
+                body: formData
+            });
+    
+            const json = await respuesta.json();
+    
+            if (json.success) {
+                Swal.fire({
+                    title: 'Eliminado del carrito',
+                    text: json.mensaje,
+                    icon: 'success'
+                }).then(() => {
+                    obtenerCarrito();
+                });
+            } else {
+                Swal.fire({
+                    title: 'Error',
+                    text: json.mensaje,
+                    icon: 'error'
+                });
+            }
+        } catch (error) {
+            console.error('Error al eliminar del carrito:', error);
+            Swal.fire({
+                title: 'Error',
+                text: 'Hubo un problema al intentar eliminar del carrito',
+                icon: 'error'
+            });
+        }
+    }
+    
+    async function confirmarCompra() {
+        const usuario = localStorage.getItem('usuario'); // Obtener nombre de usuario desde localStorage
+        const formData = new FormData();
+        formData.append('action', 'confirmarCompra');
+        formData.append('usuario', usuario); // Enviar el nombre de usuario al servidor
+    
+        try {
+            const respuesta = await fetch('php/carrito.php', {
+                method: 'POST',
+                body: formData
+            });
+    
+            const json = await respuesta.json();
+    
+            if (json.success) {
+                Swal.fire({
+                    title: 'Compra Confirmada',
+                    text: json.mensaje,
+                    icon: 'success'
+                }).then(() => {
+                    limpiarCarrito();
+                });
+            } else {
+                Swal.fire({
+                    title: 'Error',
+                    text: json.mensaje,
+                    icon: 'error'
+                });
+            }
+        } catch (error) {
+            console.error('Error al confirmar la compra:', error);
+            Swal.fire({
+                title: 'Error',
+                text: 'Hubo un problema al intentar confirmar la compra',
+                icon: 'error'
+            });
+        }
+    }
+    
+    function limpiarCarrito() {
+        albumsEnCarrito = [];
+        const carritoDiv = document.getElementById('carrito-table-body');
+        carritoDiv.innerHTML = '';
+        const carritoDisplay = document.getElementById('total-carrito-display');
+        carritoDisplay.innerHTML = '';
+    }
+    
