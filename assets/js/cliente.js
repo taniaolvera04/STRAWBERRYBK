@@ -1,6 +1,12 @@
 var action = document.getElementById("action");
 var sesion = localStorage.getItem('usuario') || "null";
 
+
+var boton=document.getElementById("boton");
+const navCombo = document.getElementById("navCombo");
+
+
+
 if (sesion === "null") {
     window.location.href = "index.html";
 }
@@ -82,6 +88,25 @@ const guardarPerfil = async (event) => {
         Swal.fire({ title: "ERROR", text: "Hubo un problema con la conexión", icon: "error" });
     }
 };
+
+
+//SELECT PARA PERFIL E HISTORIAL
+
+boton.onclick=()=>{
+    navCombo.style.display = "block"; 
+};
+
+navCombo.onchange = () => {
+    const pantalla = navCombo.value;
+    if (pantalla=="perfil") {
+        window.location.href = "perfilC.html"; 
+    }else if(pantalla=="historial"){
+        window.location.href = "historial.html"; 
+    }else if(pantalla=="catalogo"){
+        window.location.href = "cliente.html"; 
+    }
+};
+
 
 const cargarCatalogo = async () => {
     try {
@@ -292,3 +317,87 @@ function limpiarCarrito() {
     carritoDiv.innerHTML = '';
     document.getElementById('total-carrito-display').innerText = '$0';
 }
+
+
+
+
+const mostrarHis = async () => {
+    const datos = new FormData();
+    datos.append("action", "selectHis");
+    datos.append("usuario", sesion);
+
+    try {
+        const respuesta = await fetch("php/metodosA.php", { method: 'POST', body: datos });
+
+        if (!respuesta.ok) {
+            throw new Error(`Error en la red: ${respuesta.status}`);
+        }
+
+        const json = await respuesta.json();
+
+        if (!json || !Array.isArray(json.data)) {
+            throw new Error("Respuesta JSON no válida o sin datos");
+        }
+
+        let tablaHTML = `
+            <table id="tablaH" class="table table-striped w-75 text-center">
+                <thead>
+                    <tr>
+                        <th>ID ORDEN</th>
+                        <th>NOMBRE DE ÁLBUM</th>
+                        <th>FOTO</th>
+                        <th>PRECIO UNITARIO</th>
+                        <th>CANTIDAD</th>
+                        <th>TOTAL</th>
+                        <th>FECHA DE COMPRA</th>
+                    </tr>
+                </thead>
+                <tbody id="listaHis">
+        `;
+
+        json.data.forEach(item => {
+            tablaHTML += `
+                <tr>
+                    <td>${item[0]}</td>
+                    <td>${item[1]}</td>
+                    <td><img src="assets/${item[2]}" height="95px"></td>
+                    <td>${item[3]}</td>
+                    <td>${item[4]}</td>
+                    <td>${item[5]}</td>
+                    <td>${item[6]}</td>
+                </tr>
+            `;
+        });
+
+        tablaHTML += `</tbody></table>`;
+
+        document.getElementById("action").innerHTML = tablaHTML;
+
+        // Destruir tabla anterior si existe
+        if ($.fn.DataTable.isDataTable("#tablaH")) {
+            $("#tablaH").DataTable().destroy();
+        }
+
+        // Inicializar DataTable
+        $("#tablaH").DataTable({
+            lengthMenu: [5, 10, 25, 50, 100],
+            language: {
+                lengthMenu: "Mostrar _MENU_ registros por página",
+                zeroRecords: "No se encontraron resultados",
+                info: "Mostrando _START_ a _END_ de _TOTAL_ registros",
+                infoEmpty: "No hay registros disponibles",
+                infoFiltered: "(filtrados de _MAX_ registros totales)",
+                search: "Buscar:",
+                paginate: {
+                    first: "Primero",
+                    last: "Último",
+                    next: "Siguiente",
+                    previous: "Anterior"
+                }
+            }
+        });
+    } catch (error) {
+        console.error("Error al cargar órdenes:", error);
+        alert("Hubo un problema al cargar los datos. Intenta de nuevo más tarde.");
+    }
+};
